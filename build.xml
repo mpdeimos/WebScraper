@@ -1,0 +1,78 @@
+<project
+	xmlns:ivy="antlib:org.apache.ivy.ant"
+	name="WebScraper"
+	basedir="." 
+	default="help">
+
+	<target name="help">
+		<java classname="org.apache.tools.ant.Main">
+			<arg value="-projecthelp" />
+		</java>
+	</target>
+	
+    <target name="clean-lib" description="Clean the project libraries directory (dependencies)">
+        <delete includeemptydirs="true" dir="./lib"/>
+    </target>
+
+	<target name="clean-build" description="Clean build output">
+		<delete dir="./build" />
+	</target>
+	
+	<target name="clean" depends="clean-lib,clean-build" description="Clean all"/>
+	
+    <target name="retrieve" description="Retrieve dependencies with ivy">
+    	<ivy:retrieve pattern="./lib/[artifact].[ext]" type="jar" changing="false"/>
+    </target>
+
+	<target name="build" depends="retrieve" description="Compile classes">
+		<mkdir dir="./build" />
+		<mkdir dir="./build/classes" />
+
+		<javac destdir="./build/classes" debug="true" source="1.5" target="1.5">
+			<src path="./src"/>
+			<classpath>
+				<fileset dir="./lib" includes="*.jar" />
+			</classpath>
+		</javac>
+	</target>
+
+	<target name="getgitdetails" >
+		<exec executable="git" outputproperty="git.tag">
+			<arg value="name-rev"/>
+			<arg value="--name-only"/>
+			<arg value="HEAD"/>
+		</exec>
+		<exec executable="git" outputproperty="git.revision">
+			<arg value="rev-parse"/>
+			<arg value="HEAD"/>
+		</exec>
+	</target>
+
+	<target name="jar" description="Create Jars" depends="build,getgitdetails">
+
+		<mkdir dir="./build/tmp/" />
+		<mkdir dir="./build/jars/" />
+
+		<jar jarfile="./build/jars/ant-resource-compiler.jar">
+			<manifest>
+				<attribute name="Class-Path" value="." />
+				<attribute name="Git-Revision" value="${git.revision}" />
+				<attribute name="Implementation-Version" value="${git.tag}" />
+			</manifest>
+			<fileset dir="./build/classes" includes="**/*" />
+			<fileset dir="./src" includes="**/*.prototype" />
+		</jar>
+
+	</target>
+	
+    <target name="publish" depends="clean, build, jar" description="Publish this project in the ivy repository">
+    	<ivy:publish artifactspattern="./build/jars/[artifact].[ext]" 
+    			           resolver="shared"
+    			           pubrevision="latest" 
+    			           status="release"
+    					   overwrite="true"
+    	/>
+        <echo message="Released with version ${git.revision}" />
+    </target>
+
+</project>
