@@ -1,6 +1,5 @@
 package com.mpdeimos.webscraper.conversion;
 
-import com.mpdeimos.webscraper.ScrapedEnum;
 import com.mpdeimos.webscraper.ScraperException;
 import com.mpdeimos.webscraper.util.Reflections;
 
@@ -59,4 +58,15 @@ public class DefaultConverter implements Converter
 		}
 	}
 
+	/**
+	 * Interface for enumerations that are constructed from scraping text.
+	 */
+	public interface ScrapedEnum
+	{
+		/**
+		 * @return <code>true</code> if the enumeration corresponds to the
+		 *         scraped text.
+		 */
+		public boolean equalsScrapedData(String data);
+	}
 }

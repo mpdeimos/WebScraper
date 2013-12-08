@@ -16,7 +16,7 @@ public class NumberFormatConverter implements Converter
 
 	/** {@inheritDoc} */
 	@Override
-	public Object convert(String textData, Class<?> type, Field field)
+	public Number convert(String textData, Class<?> type, Field field)
 			throws ScraperException
 	{
 		try
