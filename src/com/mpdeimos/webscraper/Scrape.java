@@ -10,7 +10,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.Collection;
+import java.lang.reflect.Array;
 
 /**
  * Annotation for fields that are mapped to an element in the HTML document. The
@@ -39,15 +39,15 @@ public @interface Scrape
 
 	/**
 	 * The specified CSS query may return more than one object. If the annotated
-	 * field is a single value (i.e. no {@link Collection}), the first matching
+	 * field is a single value (i.e. no {@link Array}), the first matching
 	 * element is used and an {@link ScraperException} is thrown if multiple or
 	 * no element is found.
 	 * 
 	 * Specifying this attribute will allow picking one of multiple found
 	 * elements.
 	 * 
-	 * For annotated {@link Collection} fields, always all found elements are
-	 * stored. So specifying this attribute will throw an
+	 * For annotated {@link Array} fields, always all found elements are stored.
+	 * So specifying this attribute will throw an
 	 * {@link IllegalArgumentException}.
 	 */
 	int resultIndex() default DEFAULT_RESULT_UNBOXING;

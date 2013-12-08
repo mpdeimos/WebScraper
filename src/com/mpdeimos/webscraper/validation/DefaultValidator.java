@@ -11,7 +11,7 @@ public class DefaultValidator implements Validator
 {
 	/** {@inheritDoc} */
 	@Override
-	public void validateScrapedData(String data, Class<?> type, Field field)
+	public void validate(String data, Class<?> type, Field field)
 			throws ScraperValidationException
 	{
 		// always pass

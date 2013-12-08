@@ -14,7 +14,7 @@ public interface Validator
 	/**
 	 * @throw ScraperValidationException If validation fails.
 	 */
-	public void validateScrapedData(String textData, Class<?> type, Field field)
+	public void validate(String textData, Class<?> type, Field field)
 			throws ScraperValidationException;
 
 	/** Exception indicating an validation error. */

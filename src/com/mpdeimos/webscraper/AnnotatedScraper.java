@@ -3,6 +3,7 @@ package com.mpdeimos.webscraper;
 import com.mpdeimos.webscraper.conversion.Converter;
 import com.mpdeimos.webscraper.util.Assert;
 import com.mpdeimos.webscraper.validation.Validator;
+import com.mpdeimos.webscraper.validation.Validator.ScraperValidationException;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -149,38 +150,14 @@ import org.jsoup.select.Elements;
 			textData = textData.trim();
 		}
 
-		try
-		{
-			Validator validator = scrape.validator().newInstance();
-			validator.validateScrapedData(textData, type, field);
-		}
-		catch (InstantiationException e)
-		{
-			throw new ScraperException("Could not instantiate validator.", e); //$NON-NLS-1$
-		}
-		catch (IllegalAccessException e)
-		{
-			throw new ScraperException("Could not access validator.", e); //$NON-NLS-1$
-		}
-
 		if (textData.isEmpty() && !scrape.empty())
 		{
 			return null;
 		}
 
-		try
-		{
-			Converter convertor = scrape.convertor().newInstance();
-			return convertor.convert(textData, type, field);
-		}
-		catch (InstantiationException e)
-		{
-			throw new ScraperException("Could not instantiate convertor.", e); //$NON-NLS-1$
-		}
-		catch (IllegalAccessException e)
-		{
-			throw new ScraperException("Could not access convertor.", e); //$NON-NLS-1$
-		}
+		validate(field, scrape, type, textData);
+
+		return convert(field, scrape, type, textData);
 	}
 
 	/**
@@ -233,5 +210,50 @@ import org.jsoup.select.Elements;
 			}
 		}
 		return fields;
+	}
+
+	/** Validates the data with the specified validator. */
+	private void validate(
+			Field field,
+			Scrape scrape,
+			Class<?> type,
+			String textData)
+			throws ScraperValidationException, ScraperException
+	{
+		try
+		{
+			Validator validator = scrape.validator().newInstance();
+			validator.validate(textData, type, field);
+		}
+		catch (InstantiationException e)
+		{
+			throw new ScraperException("Could not instantiate validator.", e); //$NON-NLS-1$
+		}
+		catch (IllegalAccessException e)
+		{
+			throw new ScraperException("Could not access validator.", e); //$NON-NLS-1$
+		}
+	}
+
+	/** Converts the data with the specified converter. */
+	private Object convert(
+			Field field,
+			Scrape scrape,
+			Class<?> type,
+			String textData) throws ScraperException
+	{
+		try
+		{
+			Converter convertor = scrape.convertor().newInstance();
+			return convertor.convert(textData, type, field);
+		}
+		catch (InstantiationException e)
+		{
+			throw new ScraperException("Could not instantiate convertor.", e); //$NON-NLS-1$
+		}
+		catch (IllegalAccessException e)
+		{
+			throw new ScraperException("Could not access convertor.", e); //$NON-NLS-1$
+		}
 	}
 }
