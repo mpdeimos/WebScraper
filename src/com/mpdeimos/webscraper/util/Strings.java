@@ -1,14 +1,14 @@
 package com.mpdeimos.webscraper.util;
 
 /**
- * Various utility functions regarding strings.
+ * Utility functions regarding strings.
  * 
  * @author mpdeimos
  */
 public class Strings
 {
 	/** The empty String. */
-	public static final String EMPTY = "";
+	public static final String EMPTY = ""; //$NON-NLS-1$
 
 	/**
 	 * Returns the input string without the given suffix. If the String does not
