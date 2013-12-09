@@ -117,7 +117,7 @@ public class AnnotatedScraper implements Scraper
 				return null;
 			}
 			throw new ScraperException(
-					"CSS query '" + context.scrape.value() + "' did not return a element at index " + resultIndex); //$NON-NLS-1$ //$NON-NLS-2$
+					"CSS query '" + context.scrape.value() + "' did not return an element at index " + resultIndex); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		context.sourceElement = elements.get(resultIndex);
