@@ -25,11 +25,14 @@ import java.lang.reflect.Array;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Scrape
 {
+	/** Default replacement pattern for regex matcher replacements. */
+	public static final String DEFAULT_REGEX_MATCHER_REPLACE = "$1"; //$NON-NLS-1$
+
 	/**
 	 * The default unboxing strategy for selecting an element from the queried
 	 * HTML elements.
 	 */
-	/* package */static int DEFAULT_RESULT_UNBOXING = Integer.MIN_VALUE;
+	public static final int DEFAULT_RESULT_UNBOXING = Integer.MIN_VALUE;
 
 	/**
 	 * The CSS query to the element that is used for determining the data
@@ -74,7 +77,7 @@ public @interface Scrape
 	 * The replacement for the matched regular expression. Default is the first
 	 * matching group. Has no effect if no regular expression is specified.
 	 */
-	String replace() default "$1";
+	String replace() default DEFAULT_REGEX_MATCHER_REPLACE;
 
 	/**
 	 * Flag specifying if the extracted string should be trimmed. Default

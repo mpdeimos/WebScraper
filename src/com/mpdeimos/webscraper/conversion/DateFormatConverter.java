@@ -1,10 +1,10 @@
 package com.mpdeimos.webscraper.conversion;
 
 import com.mpdeimos.webscraper.ScraperException;
+import com.mpdeimos.webscraper.scraper.ScraperContext;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -27,18 +27,18 @@ public class DateFormatConverter implements Converter
 
 	/** {@inheritDoc} */
 	@Override
-	public Date convert(String textData, Class<?> type, Field field)
-			throws ScraperException
+	public Date convert(ScraperContext context) throws ScraperException
 	{
 		try
 		{
 			DateFormat format = DateFormat.getInstance();
-			if (field.isAnnotationPresent(Option.class))
+			if (context.getTargetField().isAnnotationPresent(Option.class))
 			{
-				Option option = field.getAnnotation(Option.class);
+				Option option = context.getTargetField().getAnnotation(
+						Option.class);
 				format = new SimpleDateFormat(option.value());
 			}
-			return format.parse(textData);
+			return format.parse(context.getSourceData());
 		}
 		catch (ParseException e)
 		{

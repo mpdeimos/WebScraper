@@ -1,9 +1,8 @@
 package com.mpdeimos.webscraper.conversion;
 
 import com.mpdeimos.webscraper.ScraperException;
+import com.mpdeimos.webscraper.scraper.ScraperContext;
 import com.mpdeimos.webscraper.util.Reflections;
-
-import java.lang.reflect.Field;
 
 /**
  * Default converter that is handling strings, primitive types and enumerations.
@@ -15,19 +14,22 @@ public class DefaultConverter implements Converter
 
 	/** {@inheritDoc} */
 	@Override
-	public Object convert(String textData, Class<?> type, Field field)
+	public Object convert(ScraperContext context)
 			throws ScraperException
 	{
+		Class<?> type = context.getTargetType();
+		String data = context.getSourceData();
+
 		if (Reflections.isPrimitiveOrWrapper(type))
 		{
-			return Reflections.stringToPrimitive(type, textData);
+			return Reflections.stringToPrimitive(type, data);
 		}
 		else if (type.isEnum())
 		{
-			return enumForTextData(type, textData);
+			return enumForTextData(type, data);
 		}
 
-		return type.cast(textData);
+		return type.cast(data);
 	}
 
 	/** @return the enumeration value corresponding to scraped data. */

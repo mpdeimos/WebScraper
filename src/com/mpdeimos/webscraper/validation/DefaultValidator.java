@@ -1,6 +1,6 @@
 package com.mpdeimos.webscraper.validation;
 
-import java.lang.reflect.Field;
+import com.mpdeimos.webscraper.scraper.ScraperContext;
 
 /**
  * Default validator that is always passing.
@@ -11,7 +11,7 @@ public class DefaultValidator implements Validator
 {
 	/** {@inheritDoc} */
 	@Override
-	public void validate(String data, Class<?> type, Field field)
+	public void validate(ScraperContext context)
 			throws ScraperValidationException
 	{
 		// always pass

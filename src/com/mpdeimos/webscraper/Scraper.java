@@ -1,5 +1,7 @@
 package com.mpdeimos.webscraper;
 
+import com.mpdeimos.webscraper.scraper.AnnotatedScraper;
+
 import org.jsoup.nodes.Element;
 
 /**
@@ -12,7 +14,7 @@ public interface Scraper
 {
 	/**
 	 * Scrapes the source HTML element (i.e. a website document) to the
-	 * specified destination object.
+	 * specified target object.
 	 */
 	public void scrape() throws ScraperException;
 
@@ -27,22 +29,22 @@ public interface Scraper
 		/** The source HTML Element. */
 		private Element source;
 
-		/** The destination object to scrape the website into. */
-		private Object destination;
+		/** The target object to scrape the website into. */
+		private Object target;
 
 		/**
 		 * @return The newly created {@link Scraper} instance.
 		 * @throws NullPointerException
-		 *             if either source or destination is <code>null</code>.
+		 *             if either source or target is <code>null</code>.
 		 */
 		public Scraper build()
 		{
-			if (this.source == null || this.destination == null)
+			if (this.source == null || this.target == null)
 			{
 				throw new NullPointerException();
 			}
 
-			return new AnnotatedScraper(this.source, this.destination);
+			return new AnnotatedScraper(this.source, this.target);
 		}
 
 		/** Sets the source HTML element to scrape data from. */
@@ -52,10 +54,10 @@ public interface Scraper
 			return this;
 		}
 
-		/** Sets the destination object to scrape data to. */
-		public Builder setDestination(Object destination)
+		/** Sets the target object to scrape data to. */
+		public Builder setTarget(Object target)
 		{
-			this.destination = destination;
+			this.target = target;
 			return this;
 		}
 	}

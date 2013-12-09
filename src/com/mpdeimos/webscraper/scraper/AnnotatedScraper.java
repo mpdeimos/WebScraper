@@ -1,5 +1,8 @@
-package com.mpdeimos.webscraper;
+package com.mpdeimos.webscraper.scraper;
 
+import com.mpdeimos.webscraper.Scrape;
+import com.mpdeimos.webscraper.Scraper;
+import com.mpdeimos.webscraper.ScraperException;
 import com.mpdeimos.webscraper.conversion.Converter;
 import com.mpdeimos.webscraper.util.Assert;
 import com.mpdeimos.webscraper.validation.Validator;
@@ -23,40 +26,39 @@ import org.jsoup.select.Elements;
  * 
  * @author mpdeimos
  */
-/* package */class AnnotatedScraper implements Scraper
+public class AnnotatedScraper implements Scraper
 {
 	/** The html element used as source for data binding. */
 	private final Element source;
 
 	/**
-	 * The annotated destination element to receive data from the source
-	 * element.
+	 * The annotated target element to receive data from the source element.
 	 */
-	private final Object destination;
+	private final Object target;
 
 	/** Constructor. */
 	public AnnotatedScraper(Element element, Object object)
 	{
 		this.source = element;
-		this.destination = object;
+		this.target = object;
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void scrape() throws ScraperException
 	{
-		for (final Field field : getAcessibleAnnotatedFields(this.destination))
+		for (final Field field : getAcessibleAnnotatedFields(this.target))
 		{
-			final Scrape scrape = field.getAnnotation(Scrape.class);
+			ScraperContext context = new ScraperContext();
+			context.scrape = field.getAnnotation(Scrape.class);
+			context.targetField = field;
+			context.targetType = field.getType();
 
-			Elements elements = this.source.select(scrape.value());
+			Elements elements = this.source.select(context.scrape.value());
 
-			Object data = extractDataFromElements(
-					elements,
-					field,
-					scrape);
+			Object data = extractDataFromElements(context, elements);
 
-			if (data != null || scrape.empty())
+			if (data != null || context.scrape.empty())
 			{
 				setFieldData(field, data);
 			}
@@ -65,31 +67,30 @@ import org.jsoup.select.Elements;
 
 	/** Extracts the data for a list of elements returned by a CSS query. */
 	private Object extractDataFromElements(
-			Elements elements,
-			Field field,
-			Scrape scrape) throws ScraperException
+			ScraperContext context,
+			Elements elements)
+			throws ScraperException
 	{
-		Class<?> fieldType = field.getType();
-		if (fieldType.isArray())
+		if (context.targetType.isArray())
 		{
-			Class<?> componentType = fieldType.getComponentType();
+			context.targetType = context.targetType.getComponentType();
 
 			List<Object> dataList = new ArrayList<Object>();
 
 			for (Element element : elements)
 			{
-				Object data = extractDataFromElement(
-						element,
-						field,
-						scrape, componentType);
+				context.sourceElement = element;
+				Object data = extractDataFromElement(context);
 
-				if (data != null || scrape.empty())
+				if (data != null || context.scrape.empty())
 				{
 					dataList.add(data);
 				}
 			}
 
-			Object array = Array.newInstance(componentType, dataList.size());
+			Object array = Array.newInstance(
+					context.targetType,
+					dataList.size());
 			for (int i = 0; i < dataList.size(); i++)
 			{
 				Array.set(array, i, dataList.get(i));
@@ -98,88 +99,82 @@ import org.jsoup.select.Elements;
 			return array;
 		}
 
-		int resultIndex = scrape.resultIndex();
+		int resultIndex = context.scrape.resultIndex();
 		if (resultIndex == Scrape.DEFAULT_RESULT_UNBOXING)
 		{
 			if (elements.size() > 1)
 			{
 				throw new ScraperException(
-						"CSS query '" + scrape.value() + "' returned more than one elements."); //$NON-NLS-1$ //$NON-NLS-2$
+						"CSS query '" + context.scrape.value() + "' returned more than one elements."); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			resultIndex = 0;
 		}
 
 		if (resultIndex >= elements.size())
 		{
-			if (scrape.lenient())
+			if (context.scrape.lenient())
 			{
 				return null;
 			}
 			throw new ScraperException(
-					"CSS query '" + scrape.value() + "' did not return a element at index " + resultIndex); //$NON-NLS-1$ //$NON-NLS-2$
+					"CSS query '" + context.scrape.value() + "' did not return a element at index " + resultIndex); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		return extractDataFromElement(
-				elements.get(resultIndex),
-				field,
-				scrape,
-				fieldType);
+		context.sourceElement = elements.get(resultIndex);
+		return extractDataFromElement(context);
 	}
 
 	/** Extracts the data for one element returned by a CSS query. */
-	private Object extractDataFromElement(
-			Element element,
-			Field field,
-			Scrape scrape,
-			Class<?> type) throws ScraperException
+	private Object extractDataFromElement(ScraperContext context)
+			throws ScraperException
 	{
-		String textData = extractTextData(element, scrape);
+		context.sourceData = extractTextData(context);
 
-		if (!scrape.regex().isEmpty())
+		if (!context.scrape.regex().isEmpty())
 		{
-			Pattern compile = Pattern.compile(scrape.regex());
-			Matcher matcher = compile.matcher(textData);
+			Pattern compile = Pattern.compile(context.scrape.regex());
+			Matcher matcher = compile.matcher(context.sourceData);
 			if (matcher.matches())
 			{
-				textData = matcher.replaceAll(scrape.replace());
+				context.sourceData = matcher.replaceAll(context.scrape.replace());
 			}
 		}
 
-		if (scrape.trim())
+		if (context.scrape.trim())
 		{
-			textData = textData.trim();
+			context.sourceData = context.sourceData.trim();
 		}
 
-		if (textData.isEmpty() && !scrape.empty())
+		if (context.sourceData.isEmpty() && !context.scrape.empty())
 		{
 			return null;
 		}
 
-		validate(field, scrape, type, textData);
+		validate(context);
 
-		return convert(field, scrape, type, textData);
+		return convert(context);
 	}
 
 	/**
 	 * Extracts the text data from the element depending of the configuration of
 	 * the {@link Scrape} annotation.
 	 */
-	private String extractTextData(Element element, Scrape scrape)
+	private String extractTextData(ScraperContext context)
 	{
-		if (scrape.attribute().isEmpty())
+		if (context.scrape.attribute().isEmpty())
 		{
-			return element.text();
+			return context.sourceElement.text();
 		}
-		return element.attr(scrape.attribute());
+		return context.sourceElement.attr(context.scrape.attribute());
 	}
 
-	/** Sets the specified value to the field of the destination object. */
+	/** Sets the specified value to the field of the target object. */
 	private void setFieldData(final Field field, Object data)
 			throws ScraperException
 	{
 		try
 		{
-			field.set(this.destination, data);
+			field.set(this.target, data);
 		}
 		catch (IllegalArgumentException e)
 		{
@@ -213,17 +208,13 @@ import org.jsoup.select.Elements;
 	}
 
 	/** Validates the data with the specified validator. */
-	private void validate(
-			Field field,
-			Scrape scrape,
-			Class<?> type,
-			String textData)
+	private void validate(ScraperContext context)
 			throws ScraperValidationException, ScraperException
 	{
 		try
 		{
-			Validator validator = scrape.validator().newInstance();
-			validator.validate(textData, type, field);
+			Validator validator = context.scrape.validator().newInstance();
+			validator.validate(context);
 		}
 		catch (InstantiationException e)
 		{
@@ -236,16 +227,12 @@ import org.jsoup.select.Elements;
 	}
 
 	/** Converts the data with the specified converter. */
-	private Object convert(
-			Field field,
-			Scrape scrape,
-			Class<?> type,
-			String textData) throws ScraperException
+	private Object convert(ScraperContext context) throws ScraperException
 	{
 		try
 		{
-			Converter convertor = scrape.convertor().newInstance();
-			return convertor.convert(textData, type, field);
+			Converter convertor = context.scrape.convertor().newInstance();
+			return convertor.convert(context);
 		}
 		catch (InstantiationException e)
 		{

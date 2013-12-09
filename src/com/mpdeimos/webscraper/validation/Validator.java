@@ -1,8 +1,7 @@
 package com.mpdeimos.webscraper.validation;
 
 import com.mpdeimos.webscraper.ScraperException;
-
-import java.lang.reflect.Field;
+import com.mpdeimos.webscraper.scraper.ScraperContext;
 
 /**
  * Interface for validating scraped content.
@@ -14,40 +13,27 @@ public interface Validator
 	/**
 	 * @throw ScraperValidationException If validation fails.
 	 */
-	public void validate(String textData, Class<?> type, Field field)
+	public void validate(ScraperContext context)
 			throws ScraperValidationException;
 
 	/** Exception indicating an validation error. */
 	public class ScraperValidationException extends ScraperException
 	{
 
-		/** The field which validation failed for. */
-		private final Field field;
-
-		/** The data that caused the validation to fail. */
-		private final Object data;
+		/** The scraper context that aused validation to fail. */
+		private final ScraperContext context;
 
 		/** Constructor. */
-		public ScraperValidationException(
-				Field field,
-				Object data,
-				String message)
+		public ScraperValidationException(ScraperContext context, String message)
 		{
 			super(message);
-			this.field = field;
-			this.data = data;
+			this.context = context;
 		}
 
-		/** @return The field which validation failed for. */
-		public Field getField()
+		/** @return The context that caused validation to fail. */
+		public ScraperContext getContext()
 		{
-			return this.field;
-		}
-
-		/** @return The data that caused the validation to fail. */
-		public Object getData()
-		{
-			return this.data;
+			return this.context;
 		}
 	}
 }
