@@ -9,6 +9,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Converter for parsing formatted numbers.
@@ -36,7 +37,7 @@ public class DateFormatConverter implements Converter
 			{
 				Option option = context.getTargetField().getAnnotation(
 						Option.class);
-				format = new SimpleDateFormat(option.value());
+				format = new SimpleDateFormat(option.value(), Locale.US);
 			}
 			return format.parse(context.getSourceData());
 		}
