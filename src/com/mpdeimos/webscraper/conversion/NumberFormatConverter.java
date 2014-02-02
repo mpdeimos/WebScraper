@@ -1,7 +1,7 @@
 package com.mpdeimos.webscraper.conversion;
 
+import com.mpdeimos.webscraper.ScraperContext;
 import com.mpdeimos.webscraper.ScraperException;
-import com.mpdeimos.webscraper.scraper.ScraperContext;
 
 import java.text.NumberFormat;
 import java.text.ParseException;

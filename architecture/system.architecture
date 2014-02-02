@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<conqat-architecture xmlns="http://conqat.cs.tum.edu/ns/architecture" policy="deny">
+   <component dim="141,91" name="conversion" pos="140,100">
+      <code-mapping regex="src/src/com/mpdeimos/webscraper/conversion/.*" type="include"/>
+      <component dim="120,40" name="convertor.ifc" pos="10,40">
+         <code-mapping regex="src/src/com/mpdeimos/webscraper/conversion/Converter\.java" type="include"/>
+      </component>
+   </component>
+   <component dim="141,91" name="validation" pos="690,100">
+      <code-mapping regex="src/src/com/mpdeimos/webscraper/validation/.*" type="include"/>
+      <component dim="120,40" name="validator.ifc" pos="10,40">
+         <code-mapping regex="src/src/com/mpdeimos/webscraper/validation/Validator\.java" type="include"/>
+      </component>
+   </component>
+   <component dim="120,40" name="util" pos="710,310" stereotype="public">
+      <code-mapping regex="src/src/com/mpdeimos/webscraper/util/.*" type="include"/>
+   </component>
+   <component dim="121,51" name="scraper" pos="380,20">
+      <code-mapping regex="src/src/com/mpdeimos/webscraper/scraper/.*" type="include"/>
+   </component>
+   <component dim="120,40" name="base" pos="350,310">
+      <code-mapping regex="src/src/com/mpdeimos/webscraper/Scrape\.java" type="include"/>
+      <code-mapping regex="src/src/com/mpdeimos/webscraper/Scraper\.java" type="include"/>
+      <code-mapping regex="src/src/com/mpdeimos/webscraper/ScraperException\.java" type="include"/>
+   </component>
+   <allow source="base" target="scraper"/>
+   <allow source="scraper" target="validator.ifc"/>
+   <allow source="scraper" target="convertor.ifc"/>
+</conqat-architecture>

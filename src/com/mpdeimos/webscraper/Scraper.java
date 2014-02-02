@@ -1,6 +1,6 @@
 package com.mpdeimos.webscraper;
 
-import com.mpdeimos.webscraper.scraper.AnnotatedScraper;
+import com.mpdeimos.webscraper.implementation.AnnotatedScraper;
 
 import org.jsoup.nodes.Element;
 

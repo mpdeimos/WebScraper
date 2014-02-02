@@ -1,6 +1,6 @@
 package com.mpdeimos.webscraper.validation;
 
-import com.mpdeimos.webscraper.scraper.ScraperContext;
+import com.mpdeimos.webscraper.ScraperContext;
 
 /**
  * Validator for enforcing non-empty text.

@@ -1,7 +1,7 @@
 package com.mpdeimos.webscraper.validation;
 
+import com.mpdeimos.webscraper.ScraperContext;
 import com.mpdeimos.webscraper.ScraperException;
-import com.mpdeimos.webscraper.scraper.ScraperContext;
 
 /**
  * Interface for validating scraped content.

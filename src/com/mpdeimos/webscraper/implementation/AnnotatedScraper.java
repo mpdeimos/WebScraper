@@ -1,7 +1,8 @@
-package com.mpdeimos.webscraper.scraper;
+package com.mpdeimos.webscraper.implementation;
 
 import com.mpdeimos.webscraper.Scrape;
 import com.mpdeimos.webscraper.Scraper;
+import com.mpdeimos.webscraper.ScraperContext;
 import com.mpdeimos.webscraper.ScraperException;
 import com.mpdeimos.webscraper.conversion.Converter;
 import com.mpdeimos.webscraper.util.Assert;

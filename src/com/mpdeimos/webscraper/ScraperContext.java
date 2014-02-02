@@ -1,6 +1,4 @@
-package com.mpdeimos.webscraper.scraper;
-
-import com.mpdeimos.webscraper.Scrape;
+package com.mpdeimos.webscraper;
 
 import java.lang.reflect.Field;
 
@@ -29,7 +27,7 @@ public class ScraperContext
 	/* package */Scrape scrape;
 
 	/** Constructor. */
-	/* package */ScraperContext()
+	public ScraperContext()
 	{
 		// explicitly make package private.
 	}
