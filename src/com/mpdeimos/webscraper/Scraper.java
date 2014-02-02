@@ -32,6 +32,13 @@ public interface Scraper
 		/** The target object to scrape the website into. */
 		private Object target;
 
+		/** Constructor. */
+		public Builder(Element source, Object target)
+		{
+			this.setSource(source);
+			this.setTarget(target);
+		}
+
 		/**
 		 * @return The newly created {@link Scraper} instance.
 		 * @throws NullPointerException
@@ -61,5 +68,4 @@ public interface Scraper
 			return this;
 		}
 	}
-
 }

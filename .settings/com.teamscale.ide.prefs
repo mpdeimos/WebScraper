@@ -1,0 +1,5 @@
+eclipse.preferences.version=1
+prefixMappings=<list>\n  <com.teamscale.ide.client.PrefixMapping>\n    <localPrefix>src</localPrefix>\n    <teamscalePrefix>src</teamscalePrefix>\n  </com.teamscale.ide.client.PrefixMapping>\n</list>
+teamscaleEnabled=true
+teamscaleProject=webscraper
+teamscaleServer=localhost

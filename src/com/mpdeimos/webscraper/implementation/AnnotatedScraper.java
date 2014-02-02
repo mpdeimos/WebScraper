@@ -2,7 +2,6 @@ package com.mpdeimos.webscraper.implementation;
 
 import com.mpdeimos.webscraper.Scrape;
 import com.mpdeimos.webscraper.Scraper;
-import com.mpdeimos.webscraper.ScraperContext;
 import com.mpdeimos.webscraper.ScraperException;
 import com.mpdeimos.webscraper.conversion.Converter;
 import com.mpdeimos.webscraper.util.Assert;
@@ -50,16 +49,13 @@ public class AnnotatedScraper implements Scraper
 	{
 		for (final Field field : getAcessibleAnnotatedFields(this.target))
 		{
-			ScraperContext context = new ScraperContext();
-			context.scrape = field.getAnnotation(Scrape.class);
-			context.targetField = field;
-			context.targetType = field.getType();
+			AnnotatedScraperContext context = new AnnotatedScraperContext(field);
 
-			Elements elements = this.source.select(context.scrape.value());
+			Elements elements = this.source.select(context.getConfiguration().value());
 
 			Object data = extractDataFromElements(context, elements);
 
-			if (data != null || context.scrape.empty())
+			if (data != null || context.getConfiguration().empty())
 			{
 				setFieldData(field, data);
 			}
@@ -68,29 +64,29 @@ public class AnnotatedScraper implements Scraper
 
 	/** Extracts the data for a list of elements returned by a CSS query. */
 	private Object extractDataFromElements(
-			ScraperContext context,
+			AnnotatedScraperContext context,
 			Elements elements)
 			throws ScraperException
 	{
-		if (context.targetType.isArray())
+		if (context.getTargetType().isArray())
 		{
-			context.targetType = context.targetType.getComponentType();
+			context.setTargetType(context.getTargetType().getComponentType());
 
 			List<Object> dataList = new ArrayList<Object>();
 
 			for (Element element : elements)
 			{
-				context.sourceElement = element;
+				context.setSourceElement(element);
 				Object data = extractDataFromElement(context);
 
-				if (data != null || context.scrape.empty())
+				if (data != null || context.getConfiguration().empty())
 				{
 					dataList.add(data);
 				}
 			}
 
 			Object array = Array.newInstance(
-					context.targetType,
+					context.getTargetType(),
 					dataList.size());
 			for (int i = 0; i < dataList.size(); i++)
 			{
@@ -100,53 +96,54 @@ public class AnnotatedScraper implements Scraper
 			return array;
 		}
 
-		int resultIndex = context.scrape.resultIndex();
+		int resultIndex = context.getConfiguration().resultIndex();
 		if (resultIndex == Scrape.DEFAULT_RESULT_UNBOXING)
 		{
 			if (elements.size() > 1)
 			{
 				throw new ScraperException(
-						"CSS query '" + context.scrape.value() + "' returned more than one elements."); //$NON-NLS-1$ //$NON-NLS-2$
+						"CSS query '" + context.getConfiguration().value() + "' returned more than one elements."); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			resultIndex = 0;
 		}
 
 		if (resultIndex >= elements.size())
 		{
-			if (context.scrape.lenient())
+			if (context.getConfiguration().lenient())
 			{
 				return null;
 			}
 			throw new ScraperException(
-					"CSS query '" + context.scrape.value() + "' did not return an element at index " + resultIndex); //$NON-NLS-1$ //$NON-NLS-2$
+					"CSS query '" + context.getConfiguration().value() + "' did not return an element at index " + resultIndex); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		context.sourceElement = elements.get(resultIndex);
+		context.setSourceElement(elements.get(resultIndex));
 		return extractDataFromElement(context);
 	}
 
 	/** Extracts the data for one element returned by a CSS query. */
-	private Object extractDataFromElement(ScraperContext context)
+	private Object extractDataFromElement(AnnotatedScraperContext context)
 			throws ScraperException
 	{
-		context.sourceData = extractTextData(context);
+		context.setSourceData(extractTextData(context));
 
-		if (!context.scrape.regex().isEmpty())
+		Scrape config = context.getConfiguration();
+		if (!config.regex().isEmpty())
 		{
-			Pattern compile = Pattern.compile(context.scrape.regex());
-			Matcher matcher = compile.matcher(context.sourceData);
+			Pattern compile = Pattern.compile(config.regex());
+			Matcher matcher = compile.matcher(context.getSourceData());
 			if (matcher.matches())
 			{
-				context.sourceData = matcher.replaceAll(context.scrape.replace());
+				context.setSourceData(matcher.replaceAll(config.replace()));
 			}
 		}
 
-		if (context.scrape.trim())
+		if (config.trim())
 		{
-			context.sourceData = context.sourceData.trim();
+			context.setSourceData(context.getSourceData().trim());
 		}
 
-		if (context.sourceData.isEmpty() && !context.scrape.empty())
+		if (context.getSourceData().isEmpty() && !config.empty())
 		{
 			return null;
 		}
@@ -160,13 +157,14 @@ public class AnnotatedScraper implements Scraper
 	 * Extracts the text data from the element depending of the configuration of
 	 * the {@link Scrape} annotation.
 	 */
-	private String extractTextData(ScraperContext context)
+	private String extractTextData(AnnotatedScraperContext context)
 	{
-		if (context.scrape.attribute().isEmpty())
+		String attribute = context.getConfiguration().attribute();
+		if (attribute.isEmpty())
 		{
-			return context.sourceElement.text();
+			return context.getSourceElement().text();
 		}
-		return context.sourceElement.attr(context.scrape.attribute());
+		return context.getSourceElement().attr(attribute);
 	}
 
 	/** Sets the specified value to the field of the target object. */
@@ -209,12 +207,12 @@ public class AnnotatedScraper implements Scraper
 	}
 
 	/** Validates the data with the specified validator. */
-	private void validate(ScraperContext context)
+	private void validate(AnnotatedScraperContext context)
 			throws ScraperValidationException, ScraperException
 	{
 		try
 		{
-			Validator validator = context.scrape.validator().newInstance();
+			Validator validator = context.getConfiguration().validator().newInstance();
 			validator.validate(context);
 		}
 		catch (InstantiationException e)
@@ -228,11 +226,12 @@ public class AnnotatedScraper implements Scraper
 	}
 
 	/** Converts the data with the specified converter. */
-	private Object convert(ScraperContext context) throws ScraperException
+	private Object convert(AnnotatedScraperContext context)
+			throws ScraperException
 	{
 		try
 		{
-			Converter convertor = context.scrape.convertor().newInstance();
+			Converter convertor = context.getConfiguration().convertor().newInstance();
 			return convertor.convert(context);
 		}
 		catch (InstantiationException e)

@@ -9,28 +9,19 @@ import org.jsoup.nodes.Element;
  * 
  * @author mpdeimos
  */
-public class ScraperContext
+public abstract class ScraperContext
 {
 	/** The source element that has been selected by the CSS query. */
-	/* package */Element sourceElement;
+	protected Element sourceElement;
 
 	/** The source data that has been extracted from the source element. */
-	/* package */String sourceData;
+	protected String sourceData;
 
 	/** The type of the target object. */
-	/* package */Class<?> targetType;
+	protected Class<?> targetType;
 
 	/** The target field. */
-	/* package */Field targetField;
-
-	/** The scraper configuration. */
-	/* package */Scrape scrape;
-
-	/** Constructor. */
-	public ScraperContext()
-	{
-		// explicitly make package private.
-	}
+	protected Field targetField;
 
 	/**
 	 * @return The source element that has been selected by the CSS query.
@@ -59,5 +50,4 @@ public class ScraperContext
 	{
 		return this.targetField;
 	}
-
 }
