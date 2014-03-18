@@ -55,4 +55,10 @@ public class AnnotatedScraperContext extends ScraperContext
 	{
 		this.targetField = targetField;
 	}
+
+	/** @see #rootElement */
+	/* package */void setRootElement(Element root)
+	{
+		this.rootElement = root;
+	}
 }

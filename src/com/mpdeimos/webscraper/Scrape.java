@@ -2,6 +2,8 @@ package com.mpdeimos.webscraper;
 
 import com.mpdeimos.webscraper.conversion.Converter;
 import com.mpdeimos.webscraper.conversion.DefaultConverter;
+import com.mpdeimos.webscraper.selection.DefaultSelector;
+import com.mpdeimos.webscraper.selection.Selector;
 import com.mpdeimos.webscraper.util.Strings;
 import com.mpdeimos.webscraper.validation.DefaultValidator;
 import com.mpdeimos.webscraper.validation.Validator;
@@ -100,5 +102,11 @@ public @interface Scrape
 	/**
 	 * The conversion processor that is used to convert scraped text to data.
 	 */
-	Class<? extends Converter> convertor() default DefaultConverter.class;
+	Class<? extends Converter> converter() default DefaultConverter.class;
+
+	/**
+	 * The root element selection processor that is used to change the root
+	 * node.
+	 */
+	Class<? extends Selector> root() default DefaultSelector.class;
 }

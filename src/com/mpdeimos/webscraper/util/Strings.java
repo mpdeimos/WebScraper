@@ -10,6 +10,9 @@ public class Strings
 	/** The empty String. */
 	public static final String EMPTY = ""; //$NON-NLS-1$
 
+	/** The nonbreaking space string. */
+	public static final CharSequence NONBREAKING_SPACE = "\u00a0"; //$NON-NLS-1$
+
 	/**
 	 * Returns the input string without the given suffix. If the String does not
 	 * end with the suffix, the original string is returned.

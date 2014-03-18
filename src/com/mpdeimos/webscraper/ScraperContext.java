@@ -11,6 +11,9 @@ import org.jsoup.nodes.Element;
  */
 public abstract class ScraperContext
 {
+	/** The root element that is used for the CSS query. */
+	protected Element rootElement;
+
 	/** The source element that has been selected by the CSS query. */
 	protected Element sourceElement;
 
@@ -22,6 +25,14 @@ public abstract class ScraperContext
 
 	/** The target field. */
 	protected Field targetField;
+
+	/**
+	 * @return The root element that is used for the CSS query.
+	 */
+	public Element getRootElement()
+	{
+		return this.rootElement;
+	}
 
 	/**
 	 * @return The source element that has been selected by the CSS query.

@@ -4,7 +4,9 @@ import com.mpdeimos.webscraper.Scrape;
 import com.mpdeimos.webscraper.Scraper;
 import com.mpdeimos.webscraper.ScraperException;
 import com.mpdeimos.webscraper.conversion.Converter;
+import com.mpdeimos.webscraper.selection.Selector;
 import com.mpdeimos.webscraper.util.Assert;
+import com.mpdeimos.webscraper.util.Strings;
 import com.mpdeimos.webscraper.validation.Validator;
 import com.mpdeimos.webscraper.validation.Validator.ScraperValidationException;
 
@@ -51,7 +53,9 @@ public class AnnotatedScraper implements Scraper
 		{
 			AnnotatedScraperContext context = new AnnotatedScraperContext(field);
 
-			Elements elements = this.source.select(context.getConfiguration().value());
+			updateRootElement(context, this.source);
+			Elements elements = context.getRootElement().select(
+					context.getConfiguration().value());
 
 			Object data = extractDataFromElements(context, elements);
 
@@ -140,7 +144,9 @@ public class AnnotatedScraper implements Scraper
 
 		if (config.trim())
 		{
-			context.setSourceData(context.getSourceData().trim());
+			context.setSourceData(context.getSourceData().trim().replace(
+					Strings.NONBREAKING_SPACE,
+					Strings.EMPTY));
 		}
 
 		if (context.getSourceData().isEmpty() && !config.empty())
@@ -206,6 +212,26 @@ public class AnnotatedScraper implements Scraper
 		return fields;
 	}
 
+	/** Gets the root element specified in the configuration. */
+	private void updateRootElement(AnnotatedScraperContext context, Element root)
+			throws ScraperException
+	{
+		try
+		{
+			context.setRootElement(root);
+			Selector selector = context.getConfiguration().root().newInstance();
+			context.setRootElement(selector.select(context));
+		}
+		catch (InstantiationException e)
+		{
+			throw new ScraperException("Could not instantiate selector.", e); //$NON-NLS-1$
+		}
+		catch (IllegalAccessException e)
+		{
+			throw new ScraperException("Could not access selector.", e); //$NON-NLS-1$
+		}
+	}
+
 	/** Validates the data with the specified validator. */
 	private void validate(AnnotatedScraperContext context)
 			throws ScraperValidationException, ScraperException
@@ -231,7 +257,7 @@ public class AnnotatedScraper implements Scraper
 	{
 		try
 		{
-			Converter convertor = context.getConfiguration().convertor().newInstance();
+			Converter convertor = context.getConfiguration().converter().newInstance();
 			return convertor.convert(context);
 		}
 		catch (InstantiationException e)
