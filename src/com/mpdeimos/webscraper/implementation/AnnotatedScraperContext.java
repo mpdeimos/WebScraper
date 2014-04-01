@@ -38,10 +38,10 @@ public class AnnotatedScraperContext extends ScraperContext
 		this.sourceElement = sourceElement;
 	}
 
-	/** Sets the source data, that has been extracted from the element. */
-	public void setSourceData(String sourceData)
+	/** Sets the source text, that has been extracted from the element. */
+	public void setSourceText(String sourceText)
 	{
-		this.sourceData = sourceData;
+		this.sourceText = sourceText;
 	}
 
 	/** Sets the target type. */

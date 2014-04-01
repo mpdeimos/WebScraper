@@ -129,27 +129,27 @@ public class AnnotatedScraper implements Scraper
 	private Object extractDataFromElement(AnnotatedScraperContext context)
 			throws ScraperException
 	{
-		context.setSourceData(extractTextData(context));
+		context.setSourceText(extractTextData(context));
 
 		Scrape config = context.getConfiguration();
 		if (!config.regex().isEmpty())
 		{
 			Pattern compile = Pattern.compile(config.regex());
-			Matcher matcher = compile.matcher(context.getSourceData());
+			Matcher matcher = compile.matcher(context.getSourceText());
 			if (matcher.matches())
 			{
-				context.setSourceData(matcher.replaceAll(config.replace()));
+				context.setSourceText(matcher.replaceAll(config.replace()));
 			}
 		}
 
 		if (config.trim())
 		{
-			context.setSourceData(context.getSourceData().trim().replace(
+			context.setSourceText(context.getSourceText().replace(
 					Strings.NONBREAKING_SPACE,
-					Strings.EMPTY));
+					Strings.SPACE).replaceAll("\\s+", Strings.SPACE).trim()); //$NON-NLS-1$
 		}
 
-		if (context.getSourceData().isEmpty() && !config.empty())
+		if (context.getSourceText().isEmpty() && !config.empty())
 		{
 			return null;
 		}

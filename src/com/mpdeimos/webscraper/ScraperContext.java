@@ -17,8 +17,8 @@ public abstract class ScraperContext
 	/** The source element that has been selected by the CSS query. */
 	protected Element sourceElement;
 
-	/** The source data that has been extracted from the source element. */
-	protected String sourceData;
+	/** The source text that has been extracted from the source element. */
+	protected String sourceText;
 
 	/** The type of the target object. */
 	protected Class<?> targetType;
@@ -43,11 +43,11 @@ public abstract class ScraperContext
 	}
 
 	/**
-	 * @return The source data that has been extracted from the source element.
+	 * @return The source text that has been extracted from the source element.
 	 */
-	public String getSourceData()
+	public String getSourceText()
 	{
-		return this.sourceData;
+		return this.sourceText;
 	}
 
 	/** @return The type of the target object. */

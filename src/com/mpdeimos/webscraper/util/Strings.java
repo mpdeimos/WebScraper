@@ -9,6 +9,8 @@ public class Strings
 {
 	/** The empty String. */
 	public static final String EMPTY = ""; //$NON-NLS-1$
+	/** The space String. */
+	public static final String SPACE = " "; //$NON-NLS-1$
 
 	/** The nonbreaking space string. */
 	public static final CharSequence NONBREAKING_SPACE = "\u00a0"; //$NON-NLS-1$

@@ -18,7 +18,7 @@ public class DefaultConverter implements Converter
 			throws ScraperException
 	{
 		Class<?> type = context.getTargetType();
-		String data = context.getSourceData();
+		String data = context.getSourceText();
 
 		if (Reflections.isPrimitiveOrWrapper(type))
 		{

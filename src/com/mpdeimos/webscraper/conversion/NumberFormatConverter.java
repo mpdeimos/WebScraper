@@ -20,7 +20,7 @@ public class NumberFormatConverter implements Converter
 	{
 		try
 		{
-			return NumberFormat.getInstance().parse(context.getSourceData());
+			return NumberFormat.getInstance().parse(context.getSourceText());
 		}
 		catch (ParseException e)
 		{

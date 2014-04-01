@@ -14,7 +14,7 @@ public class NotEmptyValidator implements Validator
 	public void validate(ScraperContext context)
 			throws ScraperValidationException
 	{
-		String data = context.getSourceData();
+		String data = context.getSourceText();
 		if (data == null || data.isEmpty())
 		{
 			throw new ScraperValidationException(

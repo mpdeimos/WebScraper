@@ -39,7 +39,7 @@ public class DateFormatConverter implements Converter
 						Option.class);
 				format = new SimpleDateFormat(option.value(), Locale.US);
 			}
-			return format.parse(context.getSourceData());
+			return format.parse(context.getSourceText());
 		}
 		catch (ParseException e)
 		{
