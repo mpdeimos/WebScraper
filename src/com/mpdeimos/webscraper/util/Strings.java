@@ -9,6 +9,10 @@ public class Strings
 {
 	/** The empty String. */
 	public static final String EMPTY = ""; //$NON-NLS-1$
+
+	/** The new line separator depending on the system configuration. */
+	public static final String NEW_LINE = System.lineSeparator();
+
 	/** The space String. */
 	public static final String SPACE = " "; //$NON-NLS-1$
 

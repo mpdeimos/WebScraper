@@ -59,7 +59,7 @@ public class AnnotatedScraper implements Scraper
 
 			Object data = extractDataFromElements(context, elements);
 
-			if (data != null || context.getConfiguration().empty())
+			if (data != null)
 			{
 				setFieldData(field, data);
 			}
