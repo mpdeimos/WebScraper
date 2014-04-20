@@ -1,5 +1,6 @@
 package com.mpdeimos.webscraper.implementation;
 
+import com.mpdeimos.webscraper.AsyncExecutor;
 import com.mpdeimos.webscraper.Scrape;
 import com.mpdeimos.webscraper.Scraper;
 import com.mpdeimos.webscraper.ScraperException;
@@ -15,6 +16,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,6 +40,9 @@ public class AnnotatedScraper implements Scraper
 	 */
 	private final Object target;
 
+	/** The executor for scraping the document. */
+	private final AsyncExecutor<Void> executor = new AsyncExecutor<Void>();
+
 	/** Constructor. */
 	public AnnotatedScraper(Element element, Object object)
 	{
@@ -51,18 +56,43 @@ public class AnnotatedScraper implements Scraper
 	{
 		for (final Field field : getAcessibleAnnotatedFields(this.target))
 		{
-			AnnotatedScraperContext context = new AnnotatedScraperContext(field);
+			final AnnotatedScraperContext context = new AnnotatedScraperContext(
+					field);
 
-			updateRootElement(context, this.source);
-			Elements elements = context.getRootElement().select(
-					context.getConfiguration().value());
-
-			Object data = extractDataFromElements(context, elements);
-
-			if (data != null)
+			if (context.isAsync())
 			{
-				setFieldData(field, data);
+				this.executor.async(new Callable<Void>()
+				{
+					@Override
+					public Void call() throws ScraperException
+					{
+						scrapeField(context);
+						return null;
+					}
+				});
 			}
+			else
+			{
+				scrapeField(context);
+			}
+		}
+
+		this.executor.await();
+	}
+
+	/** Scrapes the data from the document and assigns it to the target field. */
+	private void scrapeField(AnnotatedScraperContext context)
+			throws ScraperException
+	{
+		updateRootElement(context, this.source);
+		Elements elements = context.getRootElement().select(
+				context.getConfiguration().value());
+
+		Object data = extractDataFromElements(context, elements);
+
+		if (data != null)
+		{
+			setFieldData(context.getTargetField(), data);
 		}
 	}
 

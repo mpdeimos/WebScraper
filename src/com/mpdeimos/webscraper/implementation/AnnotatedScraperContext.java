@@ -1,5 +1,6 @@
 package com.mpdeimos.webscraper.implementation;
 
+import com.mpdeimos.webscraper.Async;
 import com.mpdeimos.webscraper.Scrape;
 import com.mpdeimos.webscraper.ScraperContext;
 
@@ -60,5 +61,16 @@ public class AnnotatedScraperContext extends ScraperContext
 	/* package */void setRootElement(Element root)
 	{
 		this.rootElement = root;
+	}
+
+	/**
+	 * @return <code>true</code> if the scraping should be performed
+	 *         asynchronously.
+	 */
+	/* package */boolean isAsync()
+	{
+		return this.targetField.isAnnotationPresent(Async.class)
+				|| this.configuration.converter().isAnnotationPresent(
+						Async.class);
 	}
 }
