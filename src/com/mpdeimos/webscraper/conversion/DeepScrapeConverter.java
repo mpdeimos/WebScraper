@@ -1,6 +1,5 @@
 package com.mpdeimos.webscraper.conversion;
 
-import com.mpdeimos.webscraper.Async;
 import com.mpdeimos.webscraper.Scraper;
 import com.mpdeimos.webscraper.ScraperContext;
 import com.mpdeimos.webscraper.ScraperException;
@@ -14,7 +13,6 @@ import com.mpdeimos.webscraper.ScraperException;
  * 
  * @author mpdeimos
  */
-@Async
 public class DeepScrapeConverter implements Converter
 {
 	/** {@inheritDoc} */
@@ -25,7 +23,7 @@ public class DeepScrapeConverter implements Converter
 		Object instance;
 		instance = instantiateTargetObject(targetType);
 
-		Scraper scraper = new Scraper.Builder(
+		Scraper scraper = Scraper.builder().add(
 				context.getSourceElement(),
 				instance).build();
 		scraper.scrape();

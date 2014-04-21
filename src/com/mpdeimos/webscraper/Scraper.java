@@ -1,74 +1,49 @@
 package com.mpdeimos.webscraper;
 
-import com.mpdeimos.webscraper.implementation.AnnotatedScraper;
+import com.mpdeimos.webscraper.ScraperSource.ScraperSourceProvider;
+import com.mpdeimos.webscraper.implementation.ThreadedScraperBuilder;
+
+import java.util.Collection;
 
 import org.jsoup.nodes.Element;
 
 /**
- * Interface definition for scraping HTML documents to plain java objects. Use
- * {@link Builder} for instantiating such a scraper instance.
+ * Class for scraping HTML documents to plain java objects. Use
+ * {@link ScraperBuilder} for instantiating such a scraper instance.
  * 
  * @author mpdeimos
  */
-public interface Scraper
+public abstract class Scraper
 {
 	/**
 	 * Scrapes the source HTML element (i.e. a website document) to the
 	 * specified target object.
 	 */
-	public void scrape() throws ScraperException;
+	public abstract void scrape() throws ScraperException;
 
-	/**
-	 * Builder factory for {@link Scraper} instances.
-	 * 
-	 * The default implementation uses {@link Scrape} annotations to define
-	 * scraping rules. It also offers asynchronous scraping
-	 */
-	public class Builder
+	/** Interface for building a {@link Scraper}. */
+	public interface ScraperBuilder
 	{
-		/** The source HTML Element. */
-		private Element source;
-
-		/** The target object to scrape the website into. */
-		private Object target;
-
-		/** The amount of threads the scraper should use. */
-		private final int nThreads = 2 * Runtime.getRuntime().availableProcessors();
-
-		/** Constructor. */
-		public Builder(Element source, Object target)
-		{
-			this.setSource(source);
-			this.setTarget(target);
-		}
-
 		/**
 		 * @return The newly created {@link Scraper} instance.
-		 * @throws NullPointerException
-		 *             if either source or target is <code>null</code>.
 		 */
-		public Scraper build()
-		{
-			if (this.source == null || this.target == null)
-			{
-				throw new NullPointerException();
-			}
+		public Scraper build();
 
-			return new AnnotatedScraper(this.source, this.target, this.nThreads);
-		}
+		public ScraperBuilder add(ScraperSourceProvider sourceAndTarget);
 
-		/** Sets the source HTML element to scrape data from. */
-		public Builder setSource(Element source)
-		{
-			this.source = source;
-			return this;
-		}
+		public ScraperBuilder add(ScraperSourceProvider... sourceAndTarget);
 
-		/** Sets the target object to scrape data to. */
-		public Builder setTarget(Object target)
-		{
-			this.target = target;
-			return this;
-		}
+		public ScraperBuilder add(
+				Collection<ScraperSourceProvider> sourceAndTarget);
+
+		public ScraperBuilder add(ScraperSource source, Object target);
+
+		public ScraperBuilder add(Element source, Object target);
+	}
+
+	/** Creates a new ScraperBuilder */
+	public static ScraperBuilder builder()
+	{
+		return new ThreadedScraperBuilder();
 	}
 }

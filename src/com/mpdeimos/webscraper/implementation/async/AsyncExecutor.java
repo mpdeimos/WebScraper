@@ -12,6 +12,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -95,6 +96,17 @@ public class AsyncExecutor
 				}
 				Assert.notCaught(cause, "Unexpected exception in async context"); //$NON-NLS-1$
 			}
+		}
+
+		this.executor.shutdown();
+		try
+		{
+			this.executor.awaitTermination(1, TimeUnit.SECONDS);
+		}
+		catch (InterruptedException e)
+		{
+			Assert.notCaught(
+					e, "All tasks should have been finished previously."); //$NON-NLS-1$
 		}
 	}
 

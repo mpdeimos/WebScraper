@@ -3,8 +3,9 @@ package com.mpdeimos.webscraper.implementation;
 import com.mpdeimos.webscraper.Scrape;
 import com.mpdeimos.webscraper.Scraper;
 import com.mpdeimos.webscraper.ScraperException;
+import com.mpdeimos.webscraper.ScraperSource;
+import com.mpdeimos.webscraper.ScraperSource.ScraperSourceProvider;
 import com.mpdeimos.webscraper.conversion.Converter;
-import com.mpdeimos.webscraper.implementation.async.AsyncExecutor;
 import com.mpdeimos.webscraper.selection.Selector;
 import com.mpdeimos.webscraper.util.Assert;
 import com.mpdeimos.webscraper.util.Strings;
@@ -16,7 +17,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,69 +30,53 @@ import org.jsoup.select.Elements;
  * 
  * @author mpdeimos
  */
-public class AnnotatedScraper implements Scraper
+public class AnnotatedScraper extends Scraper
 {
-	/** The HTML element used as source for data binding. */
-	private final Element source;
+	/** The source for data binding. */
+	private final ScraperSource source;
 
 	/**
 	 * The annotated target element to receive data from the source element.
 	 */
 	private final Object target;
 
-	/** The executor for scraping the document. */
-	private final AsyncExecutor executor;
-
 	/** Constructor. */
-	public AnnotatedScraper(Element element, Object object, int nThreads)
+	public AnnotatedScraper(ScraperSource sourc, Object object)
 	{
-		this.source = element;
+		this.source = sourc;
 		this.target = object;
-		this.executor = AsyncExecutor.createOrGetCurrent(nThreads);
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void scrape() throws ScraperException
 	{
+		final Element root = source.getElement();
+
 		for (final Field field : getAcessibleAnnotatedFields(this.target))
 		{
-			final AnnotatedScraperContext context = new AnnotatedScraperContext(
-					field);
-
-			if (context.isAsync())
-			{
-				this.executor.async(new Callable<Void>()
-				{
-					@Override
-					public Void call() throws ScraperException
-					{
-						scrapeField(context);
-						return null;
-					}
-				});
-			}
-			else
-			{
-				scrapeField(context);
-			}
+			AnnotatedScraperContext context = new AnnotatedScraperContext(field);
+			scrapeField(context, root);
 		}
-
-		this.executor.await();
 	}
 
 	/** Scrapes the data from the document and assigns it to the target field. */
-	private void scrapeField(AnnotatedScraperContext context)
+	private void scrapeField(AnnotatedScraperContext context, Element root)
 			throws ScraperException
 	{
-		updateRootElement(context, this.source);
+		updateRootElement(context, root);
 		Elements elements = context.getRootElement().select(
 				context.getConfiguration().value());
 
-		Object data = extractDataFromElements(context, elements);
+		final Object data = extractDataFromElements(context, elements);
 
 		if (data != null)
 		{
+			if (data instanceof ScraperSourceProvider)
+			{
+				Scraper.builder().add((ScraperSourceProvider) data).build().scrape();
+			}
+
 			setFieldData(context.getTargetField(), data);
 		}
 	}
