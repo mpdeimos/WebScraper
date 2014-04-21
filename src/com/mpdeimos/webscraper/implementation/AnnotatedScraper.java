@@ -1,10 +1,10 @@
 package com.mpdeimos.webscraper.implementation;
 
-import com.mpdeimos.webscraper.AsyncExecutor;
 import com.mpdeimos.webscraper.Scrape;
 import com.mpdeimos.webscraper.Scraper;
 import com.mpdeimos.webscraper.ScraperException;
 import com.mpdeimos.webscraper.conversion.Converter;
+import com.mpdeimos.webscraper.implementation.async.AsyncExecutor;
 import com.mpdeimos.webscraper.selection.Selector;
 import com.mpdeimos.webscraper.util.Assert;
 import com.mpdeimos.webscraper.util.Strings;
@@ -32,7 +32,7 @@ import org.jsoup.select.Elements;
  */
 public class AnnotatedScraper implements Scraper
 {
-	/** The html element used as source for data binding. */
+	/** The HTML element used as source for data binding. */
 	private final Element source;
 
 	/**
@@ -41,13 +41,14 @@ public class AnnotatedScraper implements Scraper
 	private final Object target;
 
 	/** The executor for scraping the document. */
-	private final AsyncExecutor<Void> executor = new AsyncExecutor<Void>();
+	private final AsyncExecutor executor;
 
 	/** Constructor. */
-	public AnnotatedScraper(Element element, Object object)
+	public AnnotatedScraper(Element element, Object object, int nThreads)
 	{
 		this.source = element;
 		this.target = object;
+		this.executor = AsyncExecutor.createOrGetCurrent(nThreads);
 	}
 
 	/** {@inheritDoc} */

@@ -22,7 +22,7 @@ public interface Scraper
 	 * Builder factory for {@link Scraper} instances.
 	 * 
 	 * The default implementation uses {@link Scrape} annotations to define
-	 * scraping rules.
+	 * scraping rules. It also offers asynchronous scraping
 	 */
 	public class Builder
 	{
@@ -31,6 +31,9 @@ public interface Scraper
 
 		/** The target object to scrape the website into. */
 		private Object target;
+
+		/** The amount of threads the scraper should use. */
+		private final int nThreads = 2 * Runtime.getRuntime().availableProcessors();
 
 		/** Constructor. */
 		public Builder(Element source, Object target)
@@ -51,7 +54,7 @@ public interface Scraper
 				throw new NullPointerException();
 			}
 
-			return new AnnotatedScraper(this.source, this.target);
+			return new AnnotatedScraper(this.source, this.target, this.nThreads);
 		}
 
 		/** Sets the source HTML element to scrape data from. */

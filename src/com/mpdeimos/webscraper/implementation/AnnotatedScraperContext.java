@@ -14,13 +14,13 @@ import org.jsoup.nodes.Element;
  * 
  * @author mpdeimos
  */
-public class AnnotatedScraperContext extends ScraperContext
+/* package */class AnnotatedScraperContext extends ScraperContext
 {
 	/** The scraper configuration. */
-	protected Scrape configuration;
+	private final Scrape configuration;
 
 	/** Constructor. */
-	protected AnnotatedScraperContext(Field field)
+	public AnnotatedScraperContext(Field field)
 	{
 		this.targetField = field;
 		this.targetType = field.getType();
