@@ -4,7 +4,6 @@ import com.mpdeimos.webscraper.Scraper;
 import com.mpdeimos.webscraper.Scraper.ScraperBuilder;
 import com.mpdeimos.webscraper.ScraperSource;
 import com.mpdeimos.webscraper.ScraperSource.ScraperSourceProvider;
-import com.mpdeimos.webscraper.implementation.async.AsyncExecutor;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,7 +22,7 @@ import org.jsoup.nodes.Element;
 public class ThreadedScraperBuilder implements ScraperBuilder
 {
 	/** The amount of threads the scraper should use. */
-	private final int nThreads = Runtime.getRuntime().availableProcessors();
+	private int nThreads = Runtime.getRuntime().availableProcessors();
 
 	/** The annotated scrapers that are scraped within the threaded scraper. */
 	private final ArrayList<Scraper> scrapers = new ArrayList<Scraper>();
@@ -81,5 +80,13 @@ public class ThreadedScraperBuilder implements ScraperBuilder
 	public ScraperBuilder add(Element source, Object target)
 	{
 		return add(ScraperSource.fromElement(source), target);
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public ScraperBuilder setParallelism(int nThreads)
+	{
+		this.nThreads = nThreads;
+		return this;
 	}
 }

@@ -2,7 +2,6 @@ package com.mpdeimos.webscraper.implementation;
 
 import com.mpdeimos.webscraper.Scraper;
 import com.mpdeimos.webscraper.ScraperException;
-import com.mpdeimos.webscraper.implementation.async.AsyncExecutor;
 
 import java.util.List;
 import java.util.concurrent.Callable;

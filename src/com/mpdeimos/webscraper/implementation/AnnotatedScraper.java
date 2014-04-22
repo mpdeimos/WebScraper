@@ -51,7 +51,7 @@ public class AnnotatedScraper extends Scraper
 	@Override
 	public void scrape() throws ScraperException
 	{
-		final Element root = source.getElement();
+		final Element root = this.source.getElement();
 
 		for (final Field field : getAcessibleAnnotatedFields(this.target))
 		{

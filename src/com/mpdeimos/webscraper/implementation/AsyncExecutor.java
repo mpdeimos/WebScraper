@@ -1,4 +1,4 @@
-package com.mpdeimos.webscraper.implementation.async;
+package com.mpdeimos.webscraper.implementation;
 
 import com.mpdeimos.webscraper.ScraperException;
 import com.mpdeimos.webscraper.util.Assert;

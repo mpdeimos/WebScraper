@@ -21,7 +21,11 @@ public abstract class Scraper
 	 */
 	public abstract void scrape() throws ScraperException;
 
-	/** Interface for building a {@link Scraper}. */
+	/**
+	 * Interface for building a {@link Scraper}. Use the methods {@link #add()}
+	 * to add objects to scrape and {@link #build()} to create the
+	 * {@link Scraper}.
+	 */
 	public interface ScraperBuilder
 	{
 		/**
@@ -29,16 +33,39 @@ public abstract class Scraper
 		 */
 		public Scraper build();
 
+		/**
+		 * Adds a {@link ScraperSourceProvider} to the list of scraped objects.
+		 */
 		public ScraperBuilder add(ScraperSourceProvider sourceAndTarget);
 
+		/**
+		 * Adds multiple {@link ScraperSourceProvider}s to the list of scraped
+		 * objects.
+		 */
 		public ScraperBuilder add(ScraperSourceProvider... sourceAndTarget);
 
+		/**
+		 * Adds multiple {@link ScraperSourceProvider}s to the list of scraped
+		 * objects.
+		 */
 		public ScraperBuilder add(
 				Collection<ScraperSourceProvider> sourceAndTarget);
 
+		/**
+		 * Adds a source and target to the list of scraped objects.
+		 */
 		public ScraperBuilder add(ScraperSource source, Object target);
 
+		/**
+		 * Adds a source element and target to the list of scraped objects.
+		 */
 		public ScraperBuilder add(Element source, Object target);
+
+		/**
+		 * Sets the number of threads that are used for scraping. Default equals
+		 * to he number of available processors.
+		 */
+		public ScraperBuilder setParallelism(int nThreads);
 	}
 
 	/** Creates a new ScraperBuilder */
