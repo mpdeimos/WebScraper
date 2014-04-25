@@ -72,11 +72,6 @@ public class AnnotatedScraper extends Scraper
 
 		if (data != null)
 		{
-			if (data instanceof ScraperSourceProvider)
-			{
-				Scraper.builder().add((ScraperSourceProvider) data).build().scrape();
-			}
-
 			setFieldData(context.getTargetField(), data);
 		}
 	}
@@ -133,7 +128,7 @@ public class AnnotatedScraper extends Scraper
 				return null;
 			}
 			throw new ScraperException(
-					"CSS query '" + context.getConfiguration().value() + "' did not return an element at index " + resultIndex); //$NON-NLS-1$ //$NON-NLS-2$
+					"CSS query '" + context.getConfiguration().value() + "' did not return an element at index " + resultIndex + " on document " + context.getRootElement().ownerDocument().baseUri()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
 
 		context.setSourceElement(elements.get(resultIndex));
@@ -171,7 +166,12 @@ public class AnnotatedScraper extends Scraper
 
 		validate(context);
 
-		return convert(context);
+		Object converted = convert(context);
+		if (converted != null && converted instanceof ScraperSourceProvider)
+		{
+			Scraper.builder().add((ScraperSourceProvider) converted).build().scrape();
+		}
+		return converted;
 	}
 
 	/**
