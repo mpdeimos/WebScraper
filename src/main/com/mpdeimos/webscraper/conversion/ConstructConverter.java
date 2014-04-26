@@ -1,15 +1,15 @@
 package com.mpdeimos.webscraper.conversion;
 
-import com.mpdeimos.webscraper.ScraperContext;
-import com.mpdeimos.webscraper.ScraperError;
-import com.mpdeimos.webscraper.ScraperException;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 
 import org.jsoup.nodes.Element;
+
+import com.mpdeimos.webscraper.ScraperContext;
+import com.mpdeimos.webscraper.ScraperError;
+import com.mpdeimos.webscraper.ScraperException;
 
 /**
  * Converter for conversion by calling a constructor using either the source
@@ -25,10 +25,10 @@ public class ConstructConverter implements Converter
 	public @interface Option
 	{
 		/** The object passed as first argument. */
-		public EArgumentType value() default EArgumentType.TEXT;
+		public EArgumentType[] value() default EArgumentType.TEXT;
 
 		/** Arbitrary array of further string arguments. */
-		public String[] arguments() default {};
+		public String[] strings() default {};
 	}
 
 	/** The type of object passed as first argument to the constructor. */
@@ -81,31 +81,43 @@ public class ConstructConverter implements Converter
 	@Override
 	public Object convert(ScraperContext context) throws ScraperException
 	{
-		EArgumentType argumentType = EArgumentType.TEXT;
+		EArgumentType[] argumentTypes = { EArgumentType.TEXT };
 		String[] args = {};
 		if (context.getTargetField().isAnnotationPresent(Option.class))
 		{
-			Option option = context.getTargetField().getAnnotation(Option.class);
-			argumentType = option.value();
-			args = option.arguments();
+			Option option = context.getTargetField()
+					.getAnnotation(Option.class);
+			argumentTypes = option.value();
+			args = option.strings();
 		}
 
 		ArrayList<Object> argList = new ArrayList<Object>();
 		ArrayList<Class<?>> argTypes = new ArrayList<Class<?>>();
-		argList.add(argumentType.getArgument(context));
 		Class<?> targetType = context.getTargetType();
-		argTypes.add(argumentType.clazz);
 
+		for (EArgumentType argType : argumentTypes)
+		{
+			argList.add(argType.getArgument(context));
+			argTypes.add(argType.clazz);
+		}
 		for (String arg : args)
 		{
 			argList.add(arg);
 			argTypes.add(arg.getClass());
 		}
 
+		return callConstructor(targetType, argTypes, argList);
+	}
+
+	/** Tries to call the constructor with the given arguments. */
+	private Object callConstructor(Class<?> targetType,
+			ArrayList<Class<?>> argTypes, ArrayList<Object> argList)
+			throws ScraperError
+	{
 		try
 		{
-			Constructor<?> constructor = targetType.getConstructor(
-					argTypes.toArray(new Class<?>[argTypes.size()]));
+			Constructor<?> constructor = targetType.getConstructor(argTypes
+					.toArray(new Class<?>[argTypes.size()]));
 			return constructor.newInstance(argList.toArray());
 		}
 		catch (ReflectiveOperationException e)
