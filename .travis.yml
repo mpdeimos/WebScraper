@@ -1,6 +1,15 @@
 language: java
-secure: "K05L9x9iftnM7SZLoTZtjwJKaIUtwrEq3I/SBsYyrz2pGdgszQB2NxLCqk+SyS9WTDnz5tOCZfLA7NJriyy2zV9YaNNq/BmOtEZF2JSS/HdF9I0DidDBR0Mbe3avApT5tu3vnlUUTEsAsuQpqXX5KrqwUjZuzKFiz8Gmw5VUZ5w="
+
 jdk:
   - oraclejdk7
+
 install: ant get-ivy
+
 script: ant test
+
+notifications:
+  email:
+    recipients:
+      - secure: L51bkmo1i3iFOzZAL7JOXxZu0jCEuQ8UrPQChzZJUaY+obHQSi+u4AcOVw3YjZeoAm2s7QuktI9kKi+ehwhQd82qVezT/SRPb1ZBecAydbdkC+KvEc2qdMV7qqHuLJ6biW/dQn5UIa8prI96pV2GuEusO4FVSiz4XXCdgpxS6T4=
+    on_success: always
+
