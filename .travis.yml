@@ -1,5 +1,6 @@
 language: java
 jdk:
   - oraclejdk7
-install: ant deps
-acript: ant build
+  - openjdk6
+install: ant get-ivy
+script: ant build

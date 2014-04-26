@@ -22,7 +22,8 @@
     <info
         organisation="com.mpdeimos"
         module="webscraper"
-        status="integration">
-	</info>
-	<dependency org="org.jsoup" name="jsoup" rev="1.7.3" />
+    />
+	<dependencies>
+    	<dependency org="org.jsoup" name="jsoup" rev="1.7.3" />
+    </dependencies>
 </ivy-module>
