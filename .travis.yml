@@ -3,4 +3,4 @@ secure: "K05L9x9iftnM7SZLoTZtjwJKaIUtwrEq3I/SBsYyrz2pGdgszQB2NxLCqk+SyS9WTDnz5tO
 jdk:
   - oraclejdk7
 install: ant get-ivy
-script: ant build
+script: ant test
