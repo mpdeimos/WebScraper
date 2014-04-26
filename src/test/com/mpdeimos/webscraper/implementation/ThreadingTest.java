@@ -1,16 +1,4 @@
-package com.mpdeimos.webscraper.tests;
-
-import com.mpdeimos.webscraper.Scrape;
-import com.mpdeimos.webscraper.Scraper;
-import com.mpdeimos.webscraper.Scraper.ScraperBuilder;
-import com.mpdeimos.webscraper.ScraperContext;
-import com.mpdeimos.webscraper.ScraperException;
-import com.mpdeimos.webscraper.ScraperSource;
-import com.mpdeimos.webscraper.ScraperSource.ScraperSourceProvider;
-import com.mpdeimos.webscraper.conversion.ConstructConverter;
-import com.mpdeimos.webscraper.conversion.ConstructConverter.EArgumentType;
-import com.mpdeimos.webscraper.conversion.Converter;
-import com.mpdeimos.webscraper.conversion.DeepScrapeConverter;
+package com.mpdeimos.webscraper.implementation;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -25,6 +13,18 @@ import java.util.Set;
 import org.jsoup.nodes.Element;
 import org.junit.Assert;
 import org.junit.Test;
+
+import com.mpdeimos.webscraper.Scrape;
+import com.mpdeimos.webscraper.Scraper;
+import com.mpdeimos.webscraper.Scraper.ScraperBuilder;
+import com.mpdeimos.webscraper.ScraperContext;
+import com.mpdeimos.webscraper.ScraperException;
+import com.mpdeimos.webscraper.ScraperSource;
+import com.mpdeimos.webscraper.ScraperSource.ScraperSourceProvider;
+import com.mpdeimos.webscraper.conversion.ConstructConverter;
+import com.mpdeimos.webscraper.conversion.ConstructConverter.EArgumentType;
+import com.mpdeimos.webscraper.conversion.Converter;
+import com.mpdeimos.webscraper.conversion.DeepScrapeConverter;
 
 /**
  * Tests scraping parallelism.
@@ -46,11 +46,8 @@ public class ThreadingTest
 		ThreadExtractingItem comparee = new ThreadExtractingItem();
 		comparee.value = "text"; //$NON-NLS-1$
 
-		assertScrapingNItemsYieldsMThreads(
-				comparee,
-				ThreadExtractingItem.class,
-				PARALLELISM,
-				PARALLELISM);
+		assertScrapingNItemsYieldsMThreads(comparee,
+				ThreadExtractingItem.class, PARALLELISM, PARALLELISM);
 	}
 
 	/**
@@ -63,11 +60,8 @@ public class ThreadingTest
 		ThreadExtractingItem comparee = new ThreadExtractingItem();
 		comparee.value = "text"; //$NON-NLS-1$
 
-		assertScrapingNItemsYieldsMThreads(
-				comparee,
-				ThreadExtractingItem.class,
-				PARALLELISM / 2,
-				PARALLELISM / 2);
+		assertScrapingNItemsYieldsMThreads(comparee,
+				ThreadExtractingItem.class, PARALLELISM / 2, PARALLELISM / 2);
 	}
 
 	/**
@@ -80,11 +74,8 @@ public class ThreadingTest
 		ThreadExtractingItem comparee = new ThreadExtractingItem();
 		comparee.value = "text"; //$NON-NLS-1$
 
-		assertScrapingNItemsYieldsMThreads(
-				comparee,
-				ThreadExtractingItem.class,
-				PARALLELISM * 2,
-				PARALLELISM);
+		assertScrapingNItemsYieldsMThreads(comparee,
+				ThreadExtractingItem.class, PARALLELISM * 2, PARALLELISM);
 	}
 
 	/**
@@ -98,28 +89,19 @@ public class ThreadingTest
 		comparee.constructed = new ThreadExtractingItem();
 		comparee.constructed.value = "text"; //$NON-NLS-1$
 
-		assertScrapingNItemsYieldsMThreads(
-				comparee,
-				ConstructingThreadExtractingItem.class,
-				1,
-				2);
+		assertScrapingNItemsYieldsMThreads(comparee,
+				ConstructingThreadExtractingItem.class, 1, 2);
 
-		assertScrapingNItemsYieldsMThreads(
-				comparee,
-				ConstructingThreadExtractingItem.class,
-				PARALLELISM / 4,
+		assertScrapingNItemsYieldsMThreads(comparee,
+				ConstructingThreadExtractingItem.class, PARALLELISM / 4,
 				PARALLELISM / 2);
 
-		assertScrapingNItemsYieldsMThreads(
-				comparee,
-				ConstructingThreadExtractingItem.class,
-				PARALLELISM / 2,
+		assertScrapingNItemsYieldsMThreads(comparee,
+				ConstructingThreadExtractingItem.class, PARALLELISM / 2,
 				PARALLELISM);
 
-		assertScrapingNItemsYieldsMThreads(
-				comparee,
-				ConstructingThreadExtractingItem.class,
-				PARALLELISM,
+		assertScrapingNItemsYieldsMThreads(comparee,
+				ConstructingThreadExtractingItem.class, PARALLELISM,
 				PARALLELISM);
 	}
 
@@ -134,29 +116,19 @@ public class ThreadingTest
 		comparee.deepScraped = new SimpleThreadExtractingItem();
 		comparee.deepScraped.value = "text"; //$NON-NLS-1$
 
-		assertScrapingNItemsYieldsMThreads(
-				comparee,
-				DeepScrapeThreadExtractingItem.class,
-				1,
-				2);
+		assertScrapingNItemsYieldsMThreads(comparee,
+				DeepScrapeThreadExtractingItem.class, 1, 2);
 
-		assertScrapingNItemsYieldsMThreads(
-				comparee,
-				DeepScrapeThreadExtractingItem.class,
-				PARALLELISM / 4,
+		assertScrapingNItemsYieldsMThreads(comparee,
+				DeepScrapeThreadExtractingItem.class, PARALLELISM / 4,
 				PARALLELISM / 2);
 
-		assertScrapingNItemsYieldsMThreads(
-				comparee,
-				DeepScrapeThreadExtractingItem.class,
-				PARALLELISM / 2,
+		assertScrapingNItemsYieldsMThreads(comparee,
+				DeepScrapeThreadExtractingItem.class, PARALLELISM / 2,
 				PARALLELISM);
 
-		assertScrapingNItemsYieldsMThreads(
-				comparee,
-				DeepScrapeThreadExtractingItem.class,
-				PARALLELISM,
-				PARALLELISM);
+		assertScrapingNItemsYieldsMThreads(comparee,
+				DeepScrapeThreadExtractingItem.class, PARALLELISM, PARALLELISM);
 	}
 
 	/**
@@ -175,38 +147,57 @@ public class ThreadingTest
 		comparee.deepScraped[2] = new SimpleThreadExtractingItem();
 		comparee.deepScraped[2].value = "c"; //$NON-NLS-1$
 
-		assertScrapingNItemsYieldsMThreads(
-				comparee,
-				DeepScrapeArrayThreadExtractingItem.class,
-				1,
-				4);
+		assertScrapingNItemsYieldsMThreads(comparee,
+				DeepScrapeArrayThreadExtractingItem.class, 1, 4);
 
-		assertScrapingNItemsYieldsMThreads(
-				comparee,
-				DeepScrapeArrayThreadExtractingItem.class,
-				PARALLELISM / 8,
+		assertScrapingNItemsYieldsMThreads(comparee,
+				DeepScrapeArrayThreadExtractingItem.class, PARALLELISM / 8,
 				PARALLELISM / 2);
 
-		assertScrapingNItemsYieldsMThreads(
-				comparee,
-				DeepScrapeArrayThreadExtractingItem.class,
-				PARALLELISM / 4,
+		assertScrapingNItemsYieldsMThreads(comparee,
+				DeepScrapeArrayThreadExtractingItem.class, PARALLELISM / 4,
 				PARALLELISM);
 
-		assertScrapingNItemsYieldsMThreads(
-				comparee,
-				DeepScrapeArrayThreadExtractingItem.class,
-				PARALLELISM,
+		assertScrapingNItemsYieldsMThreads(comparee,
+				DeepScrapeArrayThreadExtractingItem.class, PARALLELISM,
+				PARALLELISM);
+	}
+
+	/**
+	 * Tests recursive array scraping using {@link ConstructConverter}.
+	 */
+	@Test
+	public void testConstructArrayRecursion() throws Exception
+	{
+		ConstructArrayThreadExtractingItem comparee = new ConstructArrayThreadExtractingItem();
+		comparee.value = "abc"; //$NON-NLS-1$
+		comparee.constructed = new ThreadExtractingItem[3];
+		comparee.constructed[0] = new ThreadExtractingItem();
+		comparee.constructed[0].value = "a"; //$NON-NLS-1$
+		comparee.constructed[1] = new ThreadExtractingItem();
+		comparee.constructed[1].value = "b"; //$NON-NLS-1$
+		comparee.constructed[2] = new ThreadExtractingItem();
+		comparee.constructed[2].value = "c"; //$NON-NLS-1$
+
+		assertScrapingNItemsYieldsMThreads(comparee,
+				ConstructArrayThreadExtractingItem.class, 1, 4);
+
+		assertScrapingNItemsYieldsMThreads(comparee,
+				ConstructArrayThreadExtractingItem.class, PARALLELISM / 8,
+				PARALLELISM / 2);
+
+		assertScrapingNItemsYieldsMThreads(comparee,
+				ConstructArrayThreadExtractingItem.class, PARALLELISM / 4,
+				PARALLELISM);
+
+		assertScrapingNItemsYieldsMThreads(comparee,
+				ConstructArrayThreadExtractingItem.class, PARALLELISM,
 				PARALLELISM);
 	}
 
 	/** Asserts that scraping N items will yield M threads. */
 	private <T extends ScraperSourceProvider> T[] assertScrapingNItemsYieldsMThreads(
-			T comparee,
-			Class<T> clazz,
-			int n,
-			int m)
-			throws Exception
+			T comparee, Class<T> clazz, int n, int m) throws Exception
 	{
 		@SuppressWarnings("unchecked")
 		T[] array = (T[]) Array.newInstance(clazz, n);
@@ -225,9 +216,7 @@ public class ThreadingTest
 
 		Assert.assertEquals(m, ThreadNameExtractor.threadNames.size());
 
-		Assert.assertEquals(
-				Arrays.toString(comparees),
-				Arrays.toString(array));
+		Assert.assertEquals(Arrays.toString(comparees), Arrays.toString(array));
 
 		return array;
 	}
@@ -244,6 +233,18 @@ public class ThreadingTest
 		/** Dummy attribute that causes the ThreadNameExtractor to be called. */
 		@Scrape(value = ":root", converter = ThreadNameExtractor.class)
 		public String value;
+
+		/** Constructor. */
+		public SimpleThreadExtractingItem()
+		{
+			// does nothing
+		}
+
+		/** Constructor. */
+		public SimpleThreadExtractingItem(String value)
+		{
+			this.value = value;
+		}
 
 		/** {@inheritDoc} */
 		@Override
@@ -381,14 +382,59 @@ public class ThreadingTest
 			Collections.sort(list, new Comparator<SimpleThreadExtractingItem>()
 			{
 				@Override
-				public int compare(
-						SimpleThreadExtractingItem a,
+				public int compare(SimpleThreadExtractingItem a,
 						SimpleThreadExtractingItem b)
 				{
 					return a.value.compareTo(b.value);
 				}
 			});
 			return "{value=" + this.value + ",deepScraped=" //$NON-NLS-1$//$NON-NLS-2$
+					+ list.toString() + "}"; //$NON-NLS-1$
+		}
+	}
+
+	/** Item to store scraped data in. */
+	public static class ConstructArrayThreadExtractingItem implements
+			ScraperSourceProvider
+	{
+		/**
+		 * Dummy attribute that causes the ThreadNameExtractor to be called.
+		 */
+		@Scrape(value = ":root", converter = ThreadNameExtractor.class)
+		public String value;
+
+		/** Constructed item */
+		@Scrape(value = ":root n", converter = ConstructConverter.class)
+		@ConstructConverter.Option(EArgumentType.ELEMENT)
+		public ThreadExtractingItem[] constructed;
+
+		/** {@inheritDoc} */
+		@Override
+		public ScraperSource getSource()
+		{
+			return ScraperSource.fromHtml("<r>" //$NON-NLS-1$
+					+ "<n>a</n>" //$NON-NLS-1$
+					+ "<n>b</n>" //$NON-NLS-1$
+					+ "<n>c</n>" //$NON-NLS-1$
+					+ "</r>"); //$NON-NLS-1$
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public String toString()
+		{
+			List<ThreadExtractingItem> list = new ArrayList<ThreadExtractingItem>(
+					Arrays.asList(this.constructed));
+			Collections.sort(list, new Comparator<ThreadExtractingItem>()
+			{
+				@Override
+				public int compare(ThreadExtractingItem a,
+						ThreadExtractingItem b)
+				{
+					return a.value.compareTo(b.value);
+				}
+			});
+			return "{value=" + this.value + ",constructed=" //$NON-NLS-1$//$NON-NLS-2$
 					+ list.toString() + "}"; //$NON-NLS-1$
 		}
 	}
@@ -400,7 +446,8 @@ public class ThreadingTest
 	public static class ThreadNameExtractor implements Converter
 	{
 		/** The names of threads that this object was called with . */
-		public static final Set<String> threadNames = Collections.synchronizedSet(new HashSet<String>());
+		public static final Set<String> threadNames = Collections
+				.synchronizedSet(new HashSet<String>());
 
 		/** {@inheritDoc} */
 		@Override
