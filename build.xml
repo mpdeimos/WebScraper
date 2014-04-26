@@ -7,7 +7,7 @@
     <property name="ivy.install.version" value="2.4.0-rc1" />
     <property name="ivy.home" value="${user.home}/.ant" />
 	
-	<macrodef name="ivy-resolve">
+	<macrodef name="ivy-retrieve">
 		<attribute name="conf" default="*"/>
 		<sequential>
 			<ivy:retrieve pattern="./lib/[conf]/[artifact].[ext]" type="jar" changing="false" conf="@{conf}"/>
@@ -54,11 +54,11 @@
 	<target name="clean" depends="clean-lib,clean-build" description="Clean all"/>
 
     <target name="deps-main" description="Retrieve main dependencies with ivy">
-    	<ivy-resolve conf="main"/>
+    	<ivy-retrieve conf="main"/>
     </target>
     
     <target name="deps-test" description="Retrieve main dependencies with ivy">
-    	<ivy-resolve conf="test"/>
+    	<ivy-retrieve conf="test"/>
     </target>
     
     <target name="deps" depends="deps-main, deps-test" description="Retrieve all dependencies with ivy"/>

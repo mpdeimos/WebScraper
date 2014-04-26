@@ -1,59 +1,89 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <conqat-architecture xmlns="http://conqat.cs.tum.edu/ns/architecture" policy="deny">
-   <component dim="141,61" name="implementation" pos="410,10">
-      <code-mapping regex="src/com/mpdeimos/webscraper/implementation/.*" type="include"/>
+   <component dim="1111,461" name="main" pos="70,300">
+      <component dim="361,181" name="conversion" pos="20,40">
+         <component dim="161,40" name="conversion.default" pos="190,130">
+            <code-mapping regex="src/main/com/mpdeimos/webscraper/conversion/DefaultConverter\.java" type="include"/>
+         </component>
+         <component dim="161,40" name="conversion.ifc" pos="10,70">
+            <code-mapping regex="src/main/com/mpdeimos/webscraper/conversion/Converter\.java" type="include"/>
+         </component>
+         <component dim="161,40" name="conversion.impl" pos="10,130">
+            <code-mapping regex="src/main/com/mpdeimos/webscraper/conversion/.*" type="include"/>
+            <code-mapping regex="src/main/com/mpdeimos/webscraper/conversion/DefaultConverter\.java" type="exclude"/>
+            <code-mapping regex="src/main/com/mpdeimos/webscraper/conversion/Converter\.java" type="exclude"/>
+         </component>
+      </component>
+      <component dim="1071,40" name="util" pos="20,410" stereotype="public">
+         <code-mapping regex="src/main/com/mpdeimos/webscraper/util/.*" type="include"/>
+      </component>
+      <component dim="141,141" name="base" pos="400,250">
+         <code-mapping regex="src/main/com/mpdeimos/webscraper/.*" type="include"/>
+         <code-mapping regex="src/main/com/mpdeimos/webscraper/.*/.*" type="exclude"/>
+         <component dim="120,40" name="factory" pos="10,40">
+            <code-mapping regex="src/main/com/mpdeimos/webscraper/Scraper.java" type="include"/>
+         </component>
+         <component dim="120,40" name="config" pos="10,90">
+            <code-mapping regex="src/main/com/mpdeimos/webscraper/Scrape.java" type="include"/>
+         </component>
+      </component>
+      <component dim="341,181" name="validation" pos="400,40">
+         <component dim="151,40" name="validation.default" pos="180,130">
+            <code-mapping regex="src/main/com/mpdeimos/webscraper/validation/DefaultValidator\.java" type="include"/>
+         </component>
+         <component dim="151,40" name="validation.ifc" pos="180,40">
+            <code-mapping regex="src/main/com/mpdeimos/webscraper/validation/Validator\.java" type="include"/>
+         </component>
+         <component dim="151,40" name="validation.impl" pos="10,130">
+            <code-mapping regex="src/main/com/mpdeimos/webscraper/validation/.*" type="include"/>
+            <code-mapping regex="src/main/com/mpdeimos/webscraper/validation/Validator\.java" type="exclude"/>
+            <code-mapping regex="src/main/com/mpdeimos/webscraper/validation/DefaultValidator\.java" type="exclude"/>
+         </component>
+      </component>
+      <component dim="331,181" name="selector" pos="760,40">
+         <component dim="161,40" name="selector.default" pos="10,130">
+            <code-mapping regex="src/main/com/mpdeimos/webscraper/selection/DefaultSelector\.java" type="include"/>
+         </component>
+         <component dim="120,40" name="selector.ifc" pos="200,40">
+            <code-mapping regex="src/main/com/mpdeimos/webscraper/selection/Selector\.java" type="include"/>
+         </component>
+         <component dim="120,40" name="selector.impl" pos="200,130">
+            <code-mapping regex="src/main/com/mpdeimos/webscraper/selection/RelativeElementSelector\.java" type="include"/>
+         </component>
+      </component>
+      <component dim="141,141" name="scraper" pos="600,250">
+         <component dim="120,40" name="builder" pos="10,40">
+            <code-mapping regex="src/main/com/mpdeimos/webscraper/implementation/ThreadedScraperBuilder\.java" type="include"/>
+         </component>
+         <component dim="120,40" name="impl" pos="10,90">
+            <code-mapping regex="src/main/com/mpdeimos/webscraper/implementation/ThreadedScraperBuilder\.java" type="exclude"/>
+            <code-mapping regex="src/main/com/mpdeimos/webscraper/implementation/.*" type="include"/>
+         </component>
+      </component>
    </component>
-   <component dim="361,221" name="conversion" pos="-10,10">
-      <component dim="161,40" name="conversion.default" pos="180,130">
-         <code-mapping regex="src/com/mpdeimos/webscraper/conversion/DefaultConverter\.java" type="include"/>
-      </component>
-      <component dim="161,40" name="conversion.ifc" pos="190,50">
-         <code-mapping regex="src/com/mpdeimos/webscraper/conversion/Converter\.java" type="include"/>
-      </component>
-      <component dim="161,40" name="conversion.impl" pos="10,130">
-         <code-mapping regex="src/com/mpdeimos/webscraper/conversion/.*" type="include"/>
-         <code-mapping regex="src/com/mpdeimos/webscraper/conversion/DefaultConverter\.java" type="exclude"/>
-         <code-mapping regex="src/com/mpdeimos/webscraper/conversion/Converter\.java" type="exclude"/>
-      </component>
-   </component>
-   <component dim="341,221" name="validation" pos="610,10">
-      <component dim="151,40" name="validation.default" pos="10,130">
-         <code-mapping regex="src/com/mpdeimos/webscraper/validation/DefaultValidator\.java" type="include"/>
-      </component>
-      <component dim="151,40" name="validation.ifc" pos="10,50">
-         <code-mapping regex="src/com/mpdeimos/webscraper/validation/Validator\.java" type="include"/>
-      </component>
-      <component dim="151,40" name="validation.impl" pos="180,130">
-         <code-mapping regex="src/com/mpdeimos/webscraper/validation/.*" type="include"/>
-         <code-mapping regex="src/com/mpdeimos/webscraper/validation/Validator\.java" type="exclude"/>
-         <code-mapping regex="src/com/mpdeimos/webscraper/validation/DefaultValidator\.java" type="exclude"/>
-      </component>
-   </component>
-   <component dim="961,40" name="util" pos="-10,250" stereotype="public">
-      <code-mapping regex="src/com/mpdeimos/webscraper/util/.*" type="include"/>
-   </component>
-   <component dim="141,141" name="base" pos="410,90">
-      <code-mapping regex="src/com/mpdeimos/webscraper/.*" type="include"/>
-      <code-mapping regex="src/com/mpdeimos/webscraper/.*/.*" type="exclude"/>
-      <component dim="120,40" name="factory" pos="10,40">
-         <code-mapping regex="src/com/mpdeimos/webscraper/Scraper.java" type="include"/>
-      </component>
-      <component dim="120,40" name="config" pos="10,90">
-         <code-mapping regex="src/com/mpdeimos/webscraper/Scrape.java" type="include"/>
-      </component>
+   <component dim="120,461" name="tests" pos="1210,300">
+      <code-mapping regex="src/test/com/mpdeimos/webscraper/tests/ThreadingTest\.java" type="include"/>
    </component>
    <allow source="conversion" target="base"/>
    <allow source="validation" target="base"/>
    <allow source="conversion.default" target="conversion.ifc"/>
-   <allow source="base" target="conversion.ifc"/>
    <allow source="conversion.impl" target="conversion.ifc"/>
    <allow source="validation.impl" target="validation.ifc"/>
    <allow source="validation.default" target="validation.ifc"/>
-   <allow source="base" target="validation.ifc"/>
-   <allow source="implementation" target="conversion.ifc"/>
-   <allow source="implementation" target="base"/>
-   <allow source="implementation" target="validation.ifc"/>
-   <allow source="factory" target="implementation"/>
+   <allow source="tests" target="main"/>
+   <allow source="selector.impl" target="selector.ifc"/>
+   <allow source="selector.default" target="selector.ifc"/>
+   <allow source="selector" target="base"/>
+   <allow source="scraper" target="conversion.ifc"/>
+   <allow source="scraper" target="validation.ifc"/>
+   <allow source="scraper" target="selector.ifc"/>
+   <allow source="scraper" target="base"/>
+   <allow source="factory" target="builder"/>
+   <allow source="builder" target="impl"/>
+   <allow source="config" target="conversion.ifc"/>
    <allow source="config" target="conversion.default"/>
-   <allow source="config" target="validation"/>
+   <allow source="config" target="validation.ifc"/>
+   <allow source="config" target="validation.default"/>
+   <allow source="config" target="selector.ifc"/>
+   <allow source="config" target="selector.default"/>
 </conqat-architecture>
