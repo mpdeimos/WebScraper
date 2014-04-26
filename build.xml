@@ -1,6 +1,6 @@
 <project
 	xmlns:ivy="antlib:org.apache.ivy.ant"
-	name="WebScraper"
+	name="com.mpdeimos.webscraper"
 	basedir="." 
 	default="help">
 
@@ -20,11 +20,11 @@
 	
 	<target name="clean" depends="clean-lib,clean-build" description="Clean all"/>
 	
-    <target name="retrieve" description="Retrieve dependencies with ivy">
+    <target name="deps" description="Retrieve dependencies with ivy">
     	<ivy:retrieve pattern="./lib/[artifact].[ext]" type="jar" changing="false"/>
     </target>
 
-	<target name="build" depends="retrieve" description="Compile classes">
+	<target name="build" depends="deps" description="Compile classes">
 		<mkdir dir="./build" />
 		<mkdir dir="./build/classes" />
 
