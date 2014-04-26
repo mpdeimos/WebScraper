@@ -72,7 +72,7 @@ public abstract class ScraperSource
 			{
 				throw new ScraperException("Could not connect to website", e); //$NON-NLS-1$
 			}
-			return fetchDocument(url, retries--);
+			return fetchDocument(url, retries - 1);
 		}
 		return doc;
 	}
