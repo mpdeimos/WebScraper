@@ -1,4 +1,5 @@
 language: java
+secure: "K05L9x9iftnM7SZLoTZtjwJKaIUtwrEq3I/SBsYyrz2pGdgszQB2NxLCqk+SyS9WTDnz5tOCZfLA7NJriyy2zV9YaNNq/BmOtEZF2JSS/HdF9I0DidDBR0Mbe3avApT5tu3vnlUUTEsAsuQpqXX5KrqwUjZuzKFiz8Gmw5VUZ5w="
 jdk:
   - oraclejdk7
 install: ant get-ivy

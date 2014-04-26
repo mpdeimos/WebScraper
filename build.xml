@@ -5,13 +5,32 @@
 	default="help">
 	
     <property name="ivy.install.version" value="2.4.0-rc1" />
-    <condition property="ivy.home" value="${env.IVY_HOME}">
-      <isset property="env.IVY_HOME" />
-    </condition>
     <property name="ivy.home" value="${user.home}/.ant" />
-    <property name="ivy.jar.dir" value="${ivy.home}/lib" />
-    <property name="ivy.jar.file" value="${ivy.jar.dir}/ivy.jar" />
+	
+	<macrodef name="ivy-resolve">
+		<attribute name="conf" default="*"/>
+		<sequential>
+			<ivy:retrieve pattern="./lib/[conf]/[artifact].[ext]" type="jar" changing="false" conf="@{conf}"/>
+		</sequential>
+	</macrodef>
+	
+	<macrodef name="compile">
+		<attribute name="conf" default="*"/>
+		<element name="additional-classpath" optional="yes"/>
+		<sequential>
+			<mkdir dir="./build" />
+			<mkdir dir="./build/@{conf}" />
 
+			<javac destdir="./build/@{conf}" debug="true" source="1.6" target="1.6" includeantruntime="false">
+				<src path="./src/@{conf}"/>
+				<classpath>
+					<fileset dir="./lib/@{conf}" includes="*.jar" />
+					<additional-classpath/>
+				</classpath>
+			</javac>
+		</sequential>
+	</macrodef>
+	
 	<target name="help">
 		<java classname="org.apache.tools.ant.Main">
 			<arg value="-projecthelp" />
@@ -19,9 +38,9 @@
 	</target>
 	
     <target name="get-ivy">
-        <mkdir dir="${ivy.jar.dir}"/>
+        <mkdir dir="${ivy.home}/lib"/>
         <get src="http://repo2.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar" 
-             dest="${ivy.jar.file}" usetimestamp="true"/>
+             dest="${ivy.home}/lib/ivy.jar" usetimestamp="true"/>
     </target>
 
     <target name="clean-lib" description="Clean the project libraries directory (dependencies)">
@@ -33,24 +52,46 @@
 	</target>
 	
 	<target name="clean" depends="clean-lib,clean-build" description="Clean all"/>
-	
-    <target name="deps" description="Retrieve dependencies with ivy">
-        <ivy:configure />
-    	<ivy:retrieve pattern="./lib/[artifact].[ext]" type="jar" changing="false"/>
+
+    <target name="deps-main" description="Retrieve main dependencies with ivy">
+    	<ivy-resolve conf="main"/>
     </target>
+    
+    <target name="deps-test" description="Retrieve main dependencies with ivy">
+    	<ivy-resolve conf="test"/>
+    </target>
+    
+    <target name="deps" depends="deps-main, deps-test" description="Retrieve all dependencies with ivy"/>
 
-	<target name="build" depends="deps" description="Compile classes">
-		<mkdir dir="./build" />
-		<mkdir dir="./build/classes" />
-
-		<javac destdir="./build/classes" debug="true" source="1.6" target="1.6" includeantruntime="false">
-			<src path="./src"/>
-			<classpath>
-				<fileset dir="./lib" includes="*.jar" />
-			</classpath>
-		</javac>
+	<target name="compile-main" depends="deps-main" description="Compile classes">
+		<compile conf="main"/>
 	</target>
 
+	<target name="compile-test" depends="compile-main,deps-test" description="Compile classes">
+		<compile conf="test">
+			<additional-classpath>
+				<path location="./build/main" />
+			</additional-classpath>
+		</compile>
+	</target>
+	
+	<target name="build" depends="compile-main" />
+	
+	<target name="test" depends="compile-test">
+		<mkdir dir="./build/test-result"/>
+		<junit printsummary="yes" fork="no" haltonfailure="yes">
+			<classpath>
+				<fileset dir="./lib/test" includes="*.jar" />
+				<path location="./build/test" />
+				<path location="./build/main" />
+			</classpath>
+			<formatter type="plain" />
+			<batchtest todir="./build/test-result">
+				<fileset dir="./src/test"/>
+			</batchtest>
+		</junit>
+	</target>
+	
 	<target name="getgitdetails" >
 		<exec executable="git" outputproperty="git.tag">
 			<arg value="name-rev"/>

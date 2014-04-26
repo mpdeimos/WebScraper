@@ -19,11 +19,13 @@
 -->
 <ivy-module version="2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
-    <info
-        organisation="com.mpdeimos"
-        module="webscraper"
-    />
+    <info organisation="com.mpdeimos" module="webscraper" />
+    <configurations>
+        <conf name="main" description="Building and executing the library" />
+        <conf name="test" extends="main" visibility="private" description="Testing the library" />
+    </configurations>
 	<dependencies>
     	<dependency org="org.jsoup" name="jsoup" rev="1.7.3" />
+    	<dependency org="junit" name="junit" rev="4.11" conf="test->default" />
     </dependencies>
 </ivy-module>
