@@ -1,9 +1,9 @@
 <project
 	xmlns:ivy="antlib:org.apache.ivy.ant"
-	name="com.mpdeimos.webscraper"
 	basedir="." 
 	default="help">
 	
+	<property environment="env"/>
     <property name="ivy.install.version" value="2.4.0-rc1" />
     <property name="ivy.home" value="${user.home}/.ant" />
 	
@@ -92,36 +92,96 @@
 		</junit>
 	</target>
 	
-	<target name="getgitdetails" >
-		<exec executable="git" outputproperty="git.tag">
+	<target name="git-info" >
+		<exec executable="git" outputproperty="git.branch">
 			<arg value="name-rev"/>
 			<arg value="--name-only"/>
 			<arg value="HEAD"/>
 		</exec>
 		<exec executable="git" outputproperty="git.revision">
 			<arg value="rev-parse"/>
+			<arg value="--short"/>
 			<arg value="HEAD"/>
 		</exec>
+		<exec executable="git" outputproperty="git.count">
+			<arg value="rev-list"/>
+			<arg value="--count"/>
+			<arg value="--all"/>
+		</exec>
+		<exec executable="git" outputproperty="git.tag">
+			<arg value="describe"/>
+			<arg value="--always"/>
+			<arg value="--abbrev=0"/>
+		</exec>
+		<exec executable="git" outputproperty="git.describe">
+			<arg value="describe"/>
+			<arg value="--always"/>
+		</exec>
+		<exec executable="git" outputproperty="git.describe.long">
+			<arg value="describe"/>
+			<arg value="--always"/>
+			<arg value="--long"/>
+		</exec>
 	</target>
+	
+	<target name="project-info" >
+		<ivy:info/>
+		
+		<loadfile srcfile="./README.md" property="readme.title">
+			<filterchain>
+				<headfilter lines="1"/>
+				<tokenfilter>
+					<linetokenizer/>
+					<replaceregex pattern="([^\[]+).*" replace="\1"/>
+					<trim/>
+				</tokenfilter>
+			</filterchain>
+		</loadfile>
+		<loadfile srcfile="./README.md" property="readme.description">
+			<filterchain>
+				<tokenfilter>
+					<linetokenizer/>
+					<trim/>
+					<ignoreblank/>
+				</tokenfilter>
+				<headfilter lines="1" skip="2"/>
+			</filterchain>
+		</loadfile>
+	</target>
+	
+	<target name="jar" description="Create Jars" depends="build,git-info,project-info">
 
-	<target name="jar" description="Create Jars" depends="build,getgitdetails">
+		<mkdir dir="./build/jar" />
+		
+		<property name="build.jar" value="./build/jars/${ivy.organisation}.${ivy.module}.jar"/>
 
-		<mkdir dir="./build/tmp/" />
-		<mkdir dir="./build/jars/" />
-
-		<jar jarfile="./build/jars/ant-resource-compiler.jar">
+		<jar jarfile="${build.jar}">
 			<manifest>
-				<attribute name="Class-Path" value="." />
-				<attribute name="Git-Revision" value="${git.revision}" />
-				<attribute name="Implementation-Version" value="${git.tag}" />
+				<section name="${ivy.organisation}/${ivy.module}">
+					<attribute name="Class-Path" value="." />
+					<attribute name="Specification-Title" value="${readme.title}" />
+					<attribute name="Specification-Version" value="${git.tag}" />
+					<attribute name="Specification-Vendor" value="Martin Pöhlmann" />
+					<attribute name="Implementation-Title" value="${ivy.organisation}.${ivy.module}" />
+					<attribute name="Implementation-Version" value="${git.describe.long}" />
+					<attribute name="Implementation-Vendor" value="Martin Pöhlmann" />
+				</section>
 			</manifest>
-			<fileset dir="./build/classes" includes="**/*" />
-			<fileset dir="./src" includes="**/*.prototype" />
+			<fileset dir="./build/main" includes="**/*" />
+			<fileset dir="./src/main" includes="**/*.prototype" />
 		</jar>
 
 	</target>
 	
-    <target name="publish" depends="clean, build, jar" description="Publish this project in the ivy repository">
+	<target name="publish" description="Publish Jars" depends="jar" if="env.CI">
+
+		<exec executable="./.infra/smartfile/publish" failonerror="true">
+			<arg value="${build.jar}"/>
+		</exec>
+
+	</target>
+	
+    <target name="ivy-publish" depends="clean, build, jar" description="Publish this project in the ivy repository">
     	<ivy:publish artifactspattern="./build/jars/[artifact].[ext]" 
     			           resolver="shared"
     			           pubrevision="latest" 
