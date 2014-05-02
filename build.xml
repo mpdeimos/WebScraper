@@ -18,9 +18,9 @@
 		<attribute name="conf" default="*"/>
 		<element name="additional-classpath" optional="yes"/>
 		<sequential>
-			<mkdir dir="./build/@{conf}/java" />
+			<mkdir dir="./bin/@{conf}/java" />
 
-			<javac destdir="./build/@{conf}/java" debug="true" source="1.6" target="1.6" includeantruntime="false">
+			<javac destdir="./bin/@{conf}/java" debug="true" source="1.6" target="1.6" includeantruntime="false">
 				<src path="./src/@{conf}/java"/>
 				<classpath>
 					<fileset dir="./lib/@{conf}/java" includes="*.jar" />
@@ -47,7 +47,7 @@
     </target>
 
 	<target name="clean-build" description="Clean build output">
-		<delete dir="./build" />
+		<delete dir="./bin" />
 	</target>
 	
 	<target name="clean" depends="clean-lib,clean-build" description="Clean all"/>
@@ -69,7 +69,7 @@
 	<target name="compile-test" depends="compile-main,deps-test" description="Compile classes">
 		<compile conf="test">
 			<additional-classpath>
-				<path location="./build/main" />
+				<path location="./bin/main/java" />
 			</additional-classpath>
 		</compile>
 	</target>
@@ -77,16 +77,16 @@
 	<target name="build" depends="compile-main" />
 	
 	<target name="test" depends="compile-test">
-		<mkdir dir="./build/test/result"/>
+		<mkdir dir="./bin/test/result"/>
 		<junit printsummary="yes" fork="no" haltonfailure="yes">
 			<classpath>
-				<fileset dir="./lib/test" includes="*.jar" />
-				<path location="./build/test/java" />
-				<path location="./build/main/java" />
+				<fileset dir="./lib/test/java" includes="*.jar" />
+				<path location="./bin/test/java" />
+				<path location="./bin/main/java" />
 			</classpath>
 			<formatter type="plain" />
-			<batchtest todir="./build/test-result">
-				<fileset dir="./src/test"/>
+			<batchtest todir="./bin/test/result">
+				<fileset dir="./src/test/java"/>
 			</batchtest>
 		</junit>
 	</target>
@@ -150,9 +150,9 @@
 	
 	<target name="jar" description="Create Jars" depends="build,git-info,project-info">
 
-		<mkdir dir="./build/jar" />
+		<mkdir dir="./bin/main/jar" />
 		
-		<property name="build.jar" value="./build/jars/${ivy.organisation}.${ivy.module}.jar"/>
+		<property name="build.jar" value="./bin/main/jar/${ivy.organisation}.${ivy.module}.jar"/>
 
 		<jar jarfile="${build.jar}">
 			<manifest>
@@ -166,8 +166,8 @@
 					<attribute name="Implementation-Vendor" value="Martin Pöhlmann" />
 				</section>
 			</manifest>
-			<fileset dir="./build/main" includes="**/*" />
-			<fileset dir="./src/main" includes="**/*.prototype" />
+			<fileset dir="./bin/main/java" includes="**/*" />
+			<fileset dir="./src/main/java" includes="**/*.prototype" />
 		</jar>
 
 	</target>
@@ -181,7 +181,7 @@
 	</target>
 	
     <target name="ivy-publish" depends="clean, build, jar" description="Publish this project in the ivy repository">
-    	<ivy:publish artifactspattern="./build/jars/[artifact].[ext]" 
+    	<ivy:publish artifactspattern="./bin/jars/[artifact].[ext]" 
     			           resolver="shared"
     			           pubrevision="latest" 
     			           status="release"
