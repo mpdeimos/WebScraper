@@ -1,14 +1,11 @@
+sudo: false
 language: java
 
 jdk:
   - oraclejdk7
-  
+
 env:
   - secure: "W/lA3oQfMGFSHwbgR7e9sQ+0z6nXUJR9oGnefjUG7Vu2z5Wnsz0lcXN+A0soAFbm7CzrHMK4sY5V8oiqTl+cZTaULe2FjdFEQo7CffNNMwxtefIgrnpYPW5+6O9SYwja9qyHWeYQ2Kk62qiySbf2DkleBYhjzcmgcNFO4xKXa+k="
-
-install: ant ivy-get
-
-script: ant test publish
 
 notifications:
   email:
