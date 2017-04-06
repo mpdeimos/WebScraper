@@ -55,12 +55,15 @@ public class AnnotatedScraper extends Scraper
 
 		for (final Field field : getAcessibleAnnotatedFields(this.target))
 		{
-			AnnotatedScraperContext context = new AnnotatedScraperContext(field);
+			AnnotatedScraperContext context = new AnnotatedScraperContext(
+					field);
 			scrapeField(context, root);
 		}
 	}
 
-	/** Scrapes the data from the document and assigns it to the target field. */
+	/**
+	 * Scrapes the data from the document and assigns it to the target field.
+	 */
 	private void scrapeField(AnnotatedScraperContext context, Element root)
 			throws ScraperException
 	{
@@ -116,7 +119,8 @@ public class AnnotatedScraper extends Scraper
 			if (elements.size() > 1)
 			{
 				throw new ScraperException(
-						"CSS query '" + context.getConfiguration().value() + "' returned more than one elements."); //$NON-NLS-1$ //$NON-NLS-2$
+						"CSS query '" + context.getConfiguration().value() //$NON-NLS-1$
+								+ "' returned more than one elements."); //$NON-NLS-1$
 			}
 			resultIndex = 0;
 		}
@@ -128,7 +132,10 @@ public class AnnotatedScraper extends Scraper
 				return null;
 			}
 			throw new ScraperException(
-					"CSS query '" + context.getConfiguration().value() + "' did not return an element at index " + resultIndex + " on document " + context.getRootElement().ownerDocument().baseUri()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					"CSS query '" + context.getConfiguration().value() //$NON-NLS-1$
+							+ "' did not return an element at index " //$NON-NLS-1$
+							+ resultIndex + " on document " //$NON-NLS-1$
+							+ context.getRootElement().ownerDocument().baseUri());
 		}
 
 		context.setSourceElement(elements.get(resultIndex));
@@ -169,7 +176,8 @@ public class AnnotatedScraper extends Scraper
 		Object converted = convert(context);
 		if (converted != null && converted instanceof ScraperSourceProvider)
 		{
-			Scraper.builder().add((ScraperSourceProvider) converted).build().scrape();
+			Scraper.builder().add(
+					(ScraperSourceProvider) converted).build().scrape();
 		}
 		return converted;
 	}
@@ -183,6 +191,10 @@ public class AnnotatedScraper extends Scraper
 		String attribute = context.getConfiguration().attribute();
 		if (attribute.isEmpty())
 		{
+			if (context.getConfiguration().ownText())
+			{
+				return context.getSourceElement().ownText();
+			}
 			return context.getSourceElement().text();
 		}
 		return context.getSourceElement().attr(attribute);
@@ -228,7 +240,9 @@ public class AnnotatedScraper extends Scraper
 	}
 
 	/** Gets the root element specified in the configuration. */
-	private void updateRootElement(AnnotatedScraperContext context, Element root)
+	private void updateRootElement(
+			AnnotatedScraperContext context,
+			Element root)
 			throws ScraperException
 	{
 		try

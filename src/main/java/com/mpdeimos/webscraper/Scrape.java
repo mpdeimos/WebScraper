@@ -94,6 +94,12 @@ public @interface Scrape
 	boolean empty() default true;
 
 	/**
+	 * Flag specifying if only the elements own text or own text and text of
+	 * children is returned. Default: <code>false</code>
+	 */
+	boolean ownText() default false;
+
+	/**
 	 * The validation processor that is used for validating values. Default is
 	 * to always pass.
 	 */
