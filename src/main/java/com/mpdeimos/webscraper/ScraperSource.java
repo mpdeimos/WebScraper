@@ -2,6 +2,7 @@ package com.mpdeimos.webscraper;
 
 import java.io.IOException;
 
+import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -13,8 +14,23 @@ import org.jsoup.nodes.Element;
  */
 public abstract class ScraperSource
 {
-	/** Default amount of retries before an HTTP request fails. */
-	private static final int DEFAULT_RETRIES = 3;
+	/** Options for Http Connections. */
+	public static class ConnectionOptions
+	{
+		/**
+		 * The user agent to use. <code>null</code> means default
+		 * implementation.
+		 */
+		public String userAgent = null;
+
+		/**
+		 * The amount of retries before an HTTP request fails. Default: {@value}
+		 */
+		public int retries = 3;
+	}
+
+	/** The default Http connection options. */
+	private static final ConnectionOptions DEFAULT_HTTP_OPTIONS = new ConnectionOptions();
 
 	/**
 	 * Creates a {@link ScraperSource} from the document accessible from the
@@ -22,21 +38,23 @@ public abstract class ScraperSource
 	 */
 	public static ScraperSource fromUrl(String url)
 	{
-		return fromUrl(url, DEFAULT_RETRIES);
+		return fromUrl(url, DEFAULT_HTTP_OPTIONS);
 	}
 
 	/**
 	 * Creates a {@link ScraperSource} from the document accessible from the
-	 * given URL and specifies the maximum amount of retries.
+	 * given URL and specifies the Http connection options.
 	 */
-	public static ScraperSource fromUrl(final String url, final int retries)
+	public static ScraperSource fromUrl(
+			final String url,
+			final ConnectionOptions options)
 	{
 		return new ScraperSource()
 		{
 			@Override
 			public Element getElement() throws ScraperException
 			{
-				return fetchDocument(url, retries);
+				return fetchDocument(url, options);
 			}
 		};
 	}
@@ -57,24 +75,39 @@ public abstract class ScraperSource
 		return new DefaultScraperSource(element);
 	}
 
-	/** Fetches the document with the given amount of retries. */
-	private static Document fetchDocument(String url, int retries)
+	/** Fetches the document with the given Http connection options. */
+	private static Document fetchDocument(String url, ConnectionOptions options)
 			throws ScraperException
 	{
-		Document doc;
-		try
+		if (options == null)
 		{
-			doc = Jsoup.connect(url).get();
+			options = DEFAULT_HTTP_OPTIONS;
 		}
-		catch (IOException e)
+
+		for (int retries = options.retries; retries >= 0; retries--)
 		{
-			if (retries == 0)
+			try
 			{
-				throw new ScraperException("Could not connect to website", e); //$NON-NLS-1$
+				Connection connection = Jsoup.connect(url);
+				if (options.userAgent != null)
+				{
+					connection.userAgent(options.userAgent);
+				}
+
+				return connection.get();
 			}
-			return fetchDocument(url, retries - 1);
+			catch (IOException e)
+			{
+				if (retries == 0)
+				{
+					throw new ScraperException(
+							"Could not connect to website", //$NON-NLS-1$
+							e);
+				}
+			}
 		}
-		return doc;
+
+		throw new IllegalStateException("This state should not be reached"); //$NON-NLS-1$
 	}
 
 	/** @return The {@link Element} that will be scraped. */
