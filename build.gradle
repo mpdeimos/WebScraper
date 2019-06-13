@@ -1,5 +1,8 @@
 apply plugin: 'java'
 
+group = 'com.mpdeimos.webscraper'
+version = '0.9.3'
+
 repositories {
 	mavenCentral()
 }
